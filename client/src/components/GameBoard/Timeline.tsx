@@ -1,23 +1,7 @@
-/**
- * Timeline.tsx
- * Renders a player's ordered song timeline.
- *
- * During the PLACING phase for the active player, clickable insertion slots
- * appear between (and around) every card so the player can choose where to
- * place the current mystery song.
- *
- * The selected slot shows a preview of the song (year hidden) so the player
- * can see their choice before locking in.
- *
- * During REVEALING, the chosen slot shows the card with its year plus a
- * correct/wrong animation.
- */
-
 import type { Song } from '../../types';
 import { GAME_PHASE } from '../../constants/gameConstants';
 import SongCard from './SongCard';
 import styles from './Timeline.module.css';
-import React from 'react';
 
 interface Props {
   timeline: Song[];
@@ -28,6 +12,7 @@ interface Props {
   placementCorrect: boolean | null;
   onSlotClick: (index: number) => void;
   playerColor: string;
+  vertical?: boolean;
 }
 
 export default function Timeline({
@@ -39,16 +24,18 @@ export default function Timeline({
   placementCorrect,
   onSlotClick,
   playerColor,
+  vertical = false,
 }: Props) {
   const isPlacing   = isActive && phase === GAME_PHASE.PLACING;
   const isRevealing = isActive && phase === GAME_PHASE.REVEALING;
+  const slotCount   = timeline.length + 1;
 
-  // Slot count = one before each card + one after the last
-  const slotCount = timeline.length + 1;
+  const scrollClass  = vertical ? styles.timelineScrollVertical : styles.timelineScroll;
+  const innerClass   = vertical ? styles.timelineVertical       : styles.timeline;
 
   return (
-    <div className={styles.timelineScroll}>
-      <div className={styles.timeline}>
+    <div className={scrollClass}>
+      <div className={innerClass}>
         {Array.from({ length: slotCount }, (_, slotIdx) => (
           <TimelineSlot
             key={`slot-${slotIdx}`}
@@ -57,22 +44,19 @@ export default function Timeline({
             isSelected={tentativePlacementIndex === slotIdx}
             onSlotClick={onSlotClick}
             playerColor={playerColor}
-            pendingCard={
-              isPlacing && tentativePlacementIndex === slotIdx ? currentSong : null
-            }
+            pendingCard={isPlacing && tentativePlacementIndex === slotIdx ? currentSong : null}
             timelineCard={timeline[slotIdx] ?? null}
             isRevealing={isRevealing}
             tentativePlacementIndex={tentativePlacementIndex}
             placementCorrect={placementCorrect}
             currentSong={currentSong}
+            vertical={vertical}
           />
         ))}
       </div>
     </div>
   );
 }
-
-// ── TimelineSlot ──────────────────────────────────────────────────────────────
 
 interface SlotProps {
   slotIdx: number;
@@ -86,6 +70,7 @@ interface SlotProps {
   tentativePlacementIndex: number | null;
   placementCorrect: boolean | null;
   currentSong: Song | null;
+  vertical: boolean;
 }
 
 function TimelineSlot({
@@ -100,16 +85,21 @@ function TimelineSlot({
   tentativePlacementIndex,
   placementCorrect,
   currentSong,
+  vertical,
 }: SlotProps) {
   const showRevealCard =
     isRevealing && tentativePlacementIndex === slotIdx && currentSong !== null;
 
+  const slotClass = [
+    vertical ? styles.slotVertical : styles.slot,
+    isSelected ? styles.slotSelected : '',
+  ].join(' ');
+
   return (
     <>
-      {/* Clickable insertion slot — only shown during PLACING */}
       {isPlacing && (
         <button
-          className={`${styles.slot} ${isSelected ? styles.slotSelected : ''}`}
+          className={slotClass}
           style={{ '--player-color': playerColor } as React.CSSProperties}
           onClick={() => onSlotClick(slotIdx)}
           aria-label={`Insert song at position ${slotIdx + 1}`}
@@ -120,14 +110,12 @@ function TimelineSlot({
         </button>
       )}
 
-      {/* Pending preview card (hideYear = true) */}
       {pendingCard && (
         <div className={styles.pendingCardWrapper}>
           <SongCard song={pendingCard} hideYear playerColor={playerColor} />
         </div>
       )}
 
-      {/* Reveal card — shows year + correct/wrong state */}
       {showRevealCard && currentSong && (
         <div className={styles.pendingCardWrapper}>
           <SongCard
@@ -140,7 +128,6 @@ function TimelineSlot({
         </div>
       )}
 
-      {/* Existing timeline card */}
       {timelineCard && (
         <SongCard
           song={timelineCard}
@@ -151,3 +138,6 @@ function TimelineSlot({
     </>
   );
 }
+
+// React must be in scope for JSX in some configs
+import React from 'react';

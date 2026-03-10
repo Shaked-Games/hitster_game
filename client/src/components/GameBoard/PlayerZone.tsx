@@ -1,27 +1,11 @@
-/**
- * PlayerZone.tsx
- * One player's area on the board, rotated to face the correct edge.
- *
- * Rotation per position:
- *   bottom →   0° (no rotation — default reading direction)
- *   left   →  90° (player sits at the left edge)
- *   top    → 180° (player sits at the top edge)
- *   right  → -90° (player sits at the right edge)
- */
-
-import type { Player, Song } from '../../types';
+import React from 'react';
+import type { Player, Song, PlayerPosition } from '../../types';
 import Timeline from './Timeline';
 import styles from './PlayerZone.module.css';
 
-const ROTATION_BY_POSITION: Record<string, number> = {
-  bottom:   0,
-  left:    90,
-  top:    180,
-  right:  -90,
-};
-
 interface Props {
   player: Player;
+  position: PlayerPosition;   // visual position computed by GameBoard
   isCurrentPlayer: boolean;
   phase: string;
   currentSong: Song | null;
@@ -32,6 +16,7 @@ interface Props {
 
 export default function PlayerZone({
   player,
+  position,
   isCurrentPlayer,
   phase,
   currentSong,
@@ -39,18 +24,15 @@ export default function PlayerZone({
   placementCorrect,
   onSlotClick,
 }: Props) {
-  const rotation = ROTATION_BY_POSITION[player.position] ?? 0;
+  const isVertical = position === 'left' || position === 'right';
 
   return (
     <div
       className={`${styles.zone} ${isCurrentPlayer ? styles.zoneActive : ''}`}
-      data-position={player.position}
+      data-position={position}
       style={{ '--player-color': player.color } as React.CSSProperties}
     >
-      <div
-        className={`${styles.inner} ${styles[`inner_${player.position}`]}`}
-        style={{ transform: `rotate(${rotation}deg)` }}
-      >
+      <div className={`${styles.inner} ${isVertical ? styles.innerVertical : ''}`}>
         <div className={styles.header}>
           <div className={styles.colorDot} style={{ background: player.color }} />
           <span className={styles.playerName}>{player.name}</span>
@@ -66,6 +48,7 @@ export default function PlayerZone({
           placementCorrect={placementCorrect}
           onSlotClick={onSlotClick}
           playerColor={player.color}
+          vertical={isVertical}
         />
       </div>
     </div>

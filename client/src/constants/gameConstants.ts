@@ -11,7 +11,17 @@ export const WINNING_CARD_COUNT = 10 as const;
 /** The year shown on every player's starting anchor card */
 export const ANCHOR_YEAR = 1995 as const;
 
-/** Clockwise order of player board positions (index matches player index). */
+/**
+ * Clockwise visual positions starting from bottom, indexed by player count.
+ * The current player is always 'bottom'; others follow clockwise order.
+ */
+export const POSITIONS_BY_PLAYER_COUNT: Readonly<Record<number, readonly PlayerPosition[]>> = {
+  2: ['bottom', 'top'],
+  3: ['bottom', 'left', 'top'],
+  4: ['bottom', 'left', 'top', 'right'],
+} as const;
+
+/** Clockwise order — used only as fallback / for Player type init */
 export const PLAYER_POSITIONS: readonly PlayerPosition[] = [
   'bottom',
   'left',

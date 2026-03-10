@@ -84,7 +84,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  width: 100%;
+  width: 55%;
   padding: 14px 16px;
   background: var(--color-surface-2);
   border: 1px solid color-mix(in srgb, var(--player-color) 35%, transparent);
@@ -114,40 +114,54 @@
   flex-direction: column;
   gap: 4px;
   flex: 1;
+  min-width: 0;
+}
+
+.audioTrackWrapper {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.audioTrackBg {
+  position: absolute;
+  left: 0; right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.12);
+  z-index: 1;
+}
+
+.audioTrackFill {
+  position: absolute;
+  left: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--player-color);
+  max-width: 100%;
+  z-index: 2;
 }
 
 .audioProgressBar {
-  -webkit-appearance: none;
-  appearance: none;
+  position: absolute;
+  left: 0;
   width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  outline: none;
+  height: 100%;
+  opacity: 0;
   cursor: pointer;
-  background: linear-gradient(
-    to right,
-    var(--player-color) var(--progress, 0%),
-    rgba(255, 255, 255, 0.12) var(--progress, 0%)
-  );
+  margin: 0;
+  z-index: 3;
 }
 
-.audioProgressBar::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--player-color);
-  box-shadow: 0 0 6px color-mix(in srgb, var(--player-color) 60%, transparent);
-  cursor: pointer;
-}
-
-.audioProgressBar::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
-  border: none;
-  border-radius: 50%;
-  background: var(--player-color);
-  cursor: pointer;
+.audioTimes {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
 }
 
 .audioTimes {

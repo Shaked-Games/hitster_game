@@ -52,6 +52,7 @@ export default function CenterControl({
       {phase === GAME_PHASE.PLAYING && currentSong && (
         <PlayingView
           currentSong={currentSong}
+          playerColor={currentPlayer.color}
           onDoneListening={onDoneListening}
         />
       )}
@@ -103,13 +104,14 @@ function IdleView({ currentPlayer, onPlay }: IdleViewProps) {
 
 interface PlayingViewProps {
   currentSong: Song;
+  playerColor: string;
   onDoneListening: () => void;
 }
-function PlayingView({ currentSong, onDoneListening }: PlayingViewProps) {
+function PlayingView({ currentSong, playerColor, onDoneListening }: PlayingViewProps) {
   return (
     <div className={styles.playingView}>
       {currentSong.previewUrl ? (
-        <AudioPlayer src={currentSong.previewUrl} playerColor="var(--player-color)" />
+        <AudioPlayer src={currentSong.previewUrl} playerColor={playerColor} />
       ) : (
         <p className={styles.noPreview}>No preview available for this song.</p>
       )}
@@ -167,6 +169,12 @@ function AudioPlayer({ src, playerColor }: AudioPlayerProps) {
     setDuration(audio.duration);
   }
 
+  function handleDurationChange() {
+    const audio = audioRef.current;
+    if (!audio || !isFinite(audio.duration)) return;
+    setDuration(audio.duration);
+  }
+
   function handleEnded() {
     setIsPlaying(false);
     setProgress(0);
@@ -186,7 +194,9 @@ function AudioPlayer({ src, playerColor }: AudioPlayerProps) {
     return `${m}:${s.toString().padStart(2, '0')}`;
   }
 
-  const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
+  const progressPercent = (duration > 0 && isFinite(duration))
+    ? Math.min((progress / duration) * 100, 100)
+    : 0;
 
   return (
     <div
@@ -198,6 +208,7 @@ function AudioPlayer({ src, playerColor }: AudioPlayerProps) {
         src={src}
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
+        onDurationChange={handleDurationChange}
         onEnded={handleEnded}
       />
 
@@ -206,16 +217,22 @@ function AudioPlayer({ src, playerColor }: AudioPlayerProps) {
       </button>
 
       <div className={styles.audioProgressWrapper}>
-        <input
-          type="range"
-          className={styles.audioProgressBar}
-          min={0}
-          max={duration || 30}
-          step={0.1}
-          value={progress}
-          onChange={handleSeek}
-          style={{ '--progress': `${progressPercent}%` } as React.CSSProperties}
-        />
+        <div className={styles.audioTrackWrapper}>
+          <div className={styles.audioTrackBg} />
+          <div
+            className={styles.audioTrackFill}
+            style={{ width: `${progressPercent}%` }}
+          />
+          <input
+            type="range"
+            className={styles.audioProgressBar}
+            min={0}
+            max={duration || 30}
+            step={0.1}
+            value={progress}
+            onChange={handleSeek}
+          />
+        </div>
         <div className={styles.audioTimes}>
           <span>{formatTime(progress)}</span>
           <span>{formatTime(duration)}</span>
