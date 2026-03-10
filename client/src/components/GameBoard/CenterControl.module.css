@@ -1,0 +1,277 @@
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04),
+    0 0 60px color-mix(in srgb, var(--player-color) 12%, transparent);
+  transition: box-shadow 0.4s ease;
+}
+
+.instruction {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+  max-width: 220px;
+  line-height: 1.5;
+}
+
+/* ── Idle ─────────────────────────────────────────────────────────────────────── */
+
+.idleView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.turnBadge {
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--color-bg);
+}
+
+.songHint {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.playButton {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 36px;
+  background: linear-gradient(
+    135deg,
+    var(--player-color),
+    color-mix(in srgb, var(--player-color) 60%, white)
+  );
+  border-radius: 50px;
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 4px;
+  color: var(--color-bg);
+  box-shadow: 0 8px 30px color-mix(in srgb, var(--player-color) 45%, transparent);
+  transition: all 0.2s ease;
+}
+
+.playButton:hover { transform: scale(1.05); }
+.playButton:active { transform: scale(0.97); }
+
+/* ── Playing ─────────────────────────────────────────────────────────────────── */
+
+.playingView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+}
+
+.audioPlayer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--color-surface-2);
+  border: 1px solid color-mix(in srgb, var(--player-color) 35%, transparent);
+  border-radius: 14px;
+  box-shadow: 0 0 20px color-mix(in srgb, var(--player-color) 10%, transparent);
+}
+
+.audioPlayBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--player-color);
+  color: var(--color-bg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--player-color) 50%, transparent);
+}
+
+.audioPlayBtn:hover { transform: scale(1.08); }
+.audioPlayBtn:active { transform: scale(0.95); }
+
+.audioProgressWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.audioProgressBar {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+  background: linear-gradient(
+    to right,
+    var(--player-color) var(--progress, 0%),
+    rgba(255, 255, 255, 0.12) var(--progress, 0%)
+  );
+}
+
+.audioProgressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--player-color);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--player-color) 60%, transparent);
+  cursor: pointer;
+}
+
+.audioProgressBar::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: none;
+  border-radius: 50%;
+  background: var(--player-color);
+  cursor: pointer;
+}
+
+.audioTimes {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  letter-spacing: 0.5px;
+}
+
+.noPreview {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  text-align: center;
+}
+
+.doneButton {
+  padding: 12px 28px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.doneButton:hover {
+  border-color: var(--player-color);
+  color: var(--player-color);
+}
+
+/* ── Placing ─────────────────────────────────────────────────────────────────── */
+
+.placingView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.placingTitle {
+  font-family: var(--font-display);
+  font-size: 32px;
+  letter-spacing: 2px;
+  color: var(--player-color);
+}
+
+.lockButton {
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  background: var(--player-color);
+  color: var(--color-bg);
+  transition: all 0.2s ease;
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--player-color) 40%, transparent);
+}
+
+.lockButton:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
+.lockButton:not(:disabled):hover { transform: translateY(-2px); }
+
+/* ── Revealing ─────────────────────────────────────────────────────────────── */
+
+.revealingView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.resultBanner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 20px 40px;
+  border-radius: 16px;
+  animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes revealPop {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-p4); }
+.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-p1); }
+
+.resultIcon { font-size: 32px; line-height: 1; }
+
+.resultText {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 2px;
+}
+
+.resultCorrect .resultText { color: var(--color-p4); }
+.resultWrong   .resultText { color: var(--color-p1); }
+
+.resultYear {
+  font-family: var(--font-display);
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.resultCorrect .resultYear { color: var(--color-p4); }
+.resultWrong   .resultYear { color: var(--color-p1); }
+
+.nextButton {
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+}
+
+.nextButton:hover {
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-1px);
+}

@@ -1,0 +1,64 @@
+/* ── CSS Variables ─────────────────────────────────────────────────────────── */
+:root {
+  --color-bg:          #09090f;
+  --color-surface:     #12121e;
+  --color-surface-2:   #1a1a2e;
+  --color-border:      rgba(255, 255, 255, 0.08);
+  --color-text:        #f0eee8;
+  --color-text-muted:  rgba(240, 238, 232, 0.45);
+
+  /* Player accent colors */
+  --color-p1: #ff3566;
+  --color-p2: #00c8ff;
+  --color-p3: #ffd200;
+  --color-p4: #00e87a;
+
+  /* Layout sizes */
+  --zone-height:      170px;
+  --side-zone-width:  170px;
+  --card-width:       110px;
+  --card-height:      130px;
+  --card-radius:      12px;
+
+  /* Typography */
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Outfit', sans-serif;
+}
+
+/* ── Reset ─────────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  outline: none;
+}
+
+/* ── Scrollbar ─────────────────────────────────────────────────────────────── */
+::-webkit-scrollbar              { width: 6px; height: 6px; }
+::-webkit-scrollbar-track        { background: transparent; }
+::-webkit-scrollbar-thumb        { background: rgba(255,255,255,0.15); border-radius: 3px; }

@@ -1,0 +1,26 @@
+.board {
+  display: grid;
+  grid-template-areas:
+    'top    top    top'
+    'left   center right'
+    'bottom bottom bottom';
+  grid-template-columns: var(--side-zone-width) 1fr var(--side-zone-width);
+  grid-template-rows: var(--zone-height) 1fr var(--zone-height);
+  width: 100vw;
+  height: 100vh;
+  background: var(--color-bg);
+  gap: 2px;
+}
+
+.board > [data-position='bottom'] { grid-area: bottom; }
+.board > [data-position='top']    { grid-area: top; }
+.board > [data-position='left']   { grid-area: left; }
+.board > [data-position='right']  { grid-area: right; }
+
+.centerCell {
+  grid-area: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
