@@ -6,7 +6,6 @@ import {
   PLAYER_COLORS,
   PLAYER_DEFAULT_NAMES,
   WINNING_CARD_COUNT,
-  ANCHOR_YEAR,
 } from '../constants/gameConstants';
 import type { GameState, GameActions, GamePhase, Player, Song } from '../types';
 import { markSongUsed as apiMarkSongUsed, fetchPreview } from '../services/api';
@@ -52,21 +51,19 @@ function isPlacementCorrect(timeline: Song[], song: Song, slotIndex: number): bo
          (after  == null || song.year  <= after.year);
 }
 
-const ANCHOR_CARD: Song = {
-  id: 'anchor',
-  name: '',
-  artist: '',
-  year: ANCHOR_YEAR,
-  previewUrl: '',
-};
-
-function createPlayer(index: number): Player {
+function createPlayer(index: number, anchorYear: number): Player {
   return {
     id: index,
     name: PLAYER_DEFAULT_NAMES[index],
     color: PLAYER_COLORS[index],
     position: PLAYER_POSITIONS[index],
-    timeline: [ANCHOR_CARD],
+    timeline: [{
+      id: `anchor-${index}`,
+      name: '',
+      artist: '',
+      year: anchorYear,
+      previewUrl: '',
+    }],
   };
 }
 
@@ -75,7 +72,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
     case ACTION.INITIALIZE_GAME: {
       const { playerCount, songs, playlist } = action.payload;
-      const players = Array.from({ length: playerCount }, (_, i) => createPlayer(i));
+      const years = songs.map((s) => s.year);
+      const players = Array.from({ length: playerCount }, (_, i) => {
+        const anchorYear = years[Math.floor(Math.random() * years.length)];
+        return createPlayer(i, anchorYear);
+      });
       const firstSong = pickUnusedSong(songs, []);
       const usedSongIds = firstSong ? [firstSong.id] : [];
       return {
