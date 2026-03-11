@@ -26,7 +26,7 @@ export default function Timeline({
   playerColor,
   vertical = false,
 }: Props) {
-  const isPlacing   = isActive && phase === GAME_PHASE.PLACING;
+  const isPlacing   = isActive && (phase === GAME_PHASE.PLAYING);
   const isRevealing = isActive && phase === GAME_PHASE.REVEALING;
   const slotCount   = timeline.length + 1;
 
@@ -97,7 +97,7 @@ function TimelineSlot({
 
   return (
     <>
-      {isPlacing && (
+      {isPlacing && !isSelected && (
         <button
           className={slotClass}
           style={{ '--player-color': playerColor } as React.CSSProperties}

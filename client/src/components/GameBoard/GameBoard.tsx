@@ -21,7 +21,6 @@ import { POSITIONS_BY_PLAYER_COUNT } from '../../constants/gameConstants';
 import PlayerZone from './PlayerZone';
 import CenterControl from './CenterControl';
 import styles from './GameBoard.module.css';
-import React from 'react';
 
 interface Props {
   state: GameState;
@@ -56,6 +55,13 @@ export default function GameBoard({ state, actions }: Props) {
   const currentPlayer = players[currentPlayerIndex];
   const visualPositions = computeVisualPositions(players.length, currentPlayerIndex);
 
+  function handleNextTurn() {
+    if (currentSong) {
+      actions.markSongUsed(currentSong.name, currentSong.artist);
+    }
+    actions.advanceTurn();
+  }
+
   return (
     <div className={styles.board}>
       {players.map((player, i) => (
@@ -84,9 +90,8 @@ export default function GameBoard({ state, actions }: Props) {
           tentativePlacementIndex={tentativePlacementIndex}
           placementCorrect={placementCorrect}
           onPlay={actions.playSong}
-          onDoneListening={actions.doneListen}
           onConfirmPlacement={actions.confirmPlacement}
-          onNextTurn={actions.advanceTurn}
+          onNextTurn={handleNextTurn}
         />
       </div>
     </div>

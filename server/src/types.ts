@@ -8,7 +8,6 @@ export interface Song {
   name: string;
   artist: string;
   year: number;
-  spotifyLink: string;
 }
 
 export interface SongWithPreview extends Song {
@@ -21,7 +20,7 @@ export interface CsvSongRow {
   name: string;
   artist: string;
   year: string;
-  spotify_link: string;
+  used?: string;
 }
 
 /** Shape of a Deezer track search result we care about */

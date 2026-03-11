@@ -7,8 +7,9 @@
  * Results are cached after the first load.
  */
 
-import { readFile } from 'fs/promises';
+import { readFile, writeFile } from 'fs/promises';
 import { parse } from 'csv-parse/sync';
+import { stringify } from 'csv-stringify/sync';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
 import type { SongWithPreview, CsvSongRow, DeezerSearchResponse } from './types';
@@ -31,7 +32,6 @@ function parseSongRow(row: CsvSongRow): Omit<SongWithPreview, 'previewUrl'> {
     name: row.name?.trim() ?? '',
     artist: row.artist?.trim() ?? '',
     year: parseInt(row.year, 10),
-    spotifyLink: row.spotify_link?.trim() ?? '',
   };
 }
 
@@ -85,7 +85,10 @@ export async function loadSongs(): Promise<SongWithPreview[]> {
     trim: true,
   });
 
-  const baseSongs = rows.map(parseSongRow).filter(isValidSong);
+  const baseSongs = rows
+    .map(parseSongRow)
+    .filter(isValidSong)
+    .filter((_, i) => rows[i].used !== 'true');  // skip already-used songs
 
   console.log(`🎵 Fetching Deezer previews for ${baseSongs.length} songs…`);
 
@@ -101,4 +104,38 @@ export async function loadSongs(): Promise<SongWithPreview[]> {
 
   cachedSongs = songsWithPreviews;
   return cachedSongs;
+}
+
+/**
+ * Marks a song as used in the CSV by name+artist match.
+ * Clears the in-memory cache so the next game load picks it up.
+ */
+export async function markSongUsed(name: string, artist: string): Promise<void> {
+  const rawCsv = await readFile(SONGS_CSV_PATH, 'utf-8');
+  const rows: CsvSongRow[] = parse(rawCsv, {
+    columns: true,
+    skip_empty_lines: true,
+    trim: true,
+  });
+
+  let changed = false;
+  for (const row of rows) {
+    if (
+      row.name.toLowerCase() === name.toLowerCase() &&
+      row.artist.toLowerCase() === artist.toLowerCase()
+    ) {
+      row.used = 'true';
+      changed = true;
+      break;
+    }
+  }
+
+  if (changed) {
+    const output = stringify(rows, {
+      header: true,
+      columns: ['name', 'artist', 'year', 'used'],
+    });
+    await writeFile(SONGS_CSV_PATH, output, 'utf-8');
+    cachedSongs = null; // bust cache so next game reloads without this song
+  }
 }

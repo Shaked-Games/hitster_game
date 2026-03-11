@@ -50,10 +50,8 @@ export const GAME_PHASE = {
   SETUP: 'setup',
   /** Current player's turn begins; waiting for Play button. */
   IDLE: 'idle',
-  /** Spotify embed is visible; song is (or can be) playing. */
+  /** Song is playing and player is choosing a timeline slot simultaneously. */
   PLAYING: 'playing',
-  /** Player is choosing a timeline slot. */
-  PLACING: 'placing',
   /** Year is revealed; result shown before advancing. */
   REVEALING: 'revealing',
   /** A player has reached WINNING_CARD_COUNT. */
@@ -64,7 +62,6 @@ export const GAME_PHASE = {
 export const ACTION = {
   INITIALIZE_GAME:   'INITIALIZE_GAME',
   PLAY_SONG:         'PLAY_SONG',
-  DONE_LISTENING:    'DONE_LISTENING',
   SELECT_PLACEMENT:  'SELECT_PLACEMENT',
   CONFIRM_PLACEMENT: 'CONFIRM_PLACEMENT',
   ADVANCE_TURN:      'ADVANCE_TURN',

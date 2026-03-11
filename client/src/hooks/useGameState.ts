@@ -15,13 +15,13 @@ import {
   ANCHOR_YEAR,
 } from '../constants/gameConstants';
 import type { GameState, GameActions, GamePhase, Player, Song } from '../types';
+import { markSongUsed as apiMarkSongUsed } from '../services/api';
 
 // ── Reducer Action Types ───────────────────────────────────────────────────────
 
 type GameAction =
   | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[] } }
   | { type: 'PLAY_SONG' }
-  | { type: 'DONE_LISTENING' }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
   | { type: 'CONFIRM_PLACEMENT' }
   | { type: 'ADVANCE_TURN' };
@@ -138,9 +138,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case ACTION.PLAY_SONG:
       return { ...state, phase: GAME_PHASE.PLAYING };
 
-    case ACTION.DONE_LISTENING:
-      return { ...state, phase: GAME_PHASE.PLACING };
-
     case ACTION.SELECT_PLACEMENT:
       return { ...state, tentativePlacementIndex: action.payload.slotIndex };
 
@@ -226,9 +223,6 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     playSong: () =>
       dispatch({ type: ACTION.PLAY_SONG }),
 
-    doneListen: () =>
-      dispatch({ type: ACTION.DONE_LISTENING }),
-
     selectPlacement: (slotIndex) =>
       dispatch({ type: ACTION.SELECT_PLACEMENT, payload: { slotIndex } }),
 
@@ -237,6 +231,8 @@ export function useGameState(): { state: GameState; actions: GameActions } {
 
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),
+
+    markSongUsed: (name, artist) => apiMarkSongUsed(name, artist),
   };
 
   return { state, actions };

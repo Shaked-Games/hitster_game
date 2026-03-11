@@ -1,11 +1,8 @@
 /**
  * CenterControl.tsx
- * The command center of the game board.
- *
  * Renders a different view per game phase:
  *   IDLE      – player name badge + Play button
- *   PLAYING   – Spotify embed iframe + "Done Listening" button
- *   PLACING   – instructions + "Lock In" button (enabled after a slot is chosen)
+ *   PLAYING   – audio player + lock-in button (slot selection happens on the timeline simultaneously)
  *   REVEALING – correct/wrong result + year reveal + "Next Player" button
  */
 
@@ -21,7 +18,6 @@ interface Props {
   tentativePlacementIndex: number | null;
   placementCorrect: boolean | null;
   onPlay: () => void;
-  onDoneListening: () => void;
   onConfirmPlacement: () => void;
   onNextTurn: () => void;
 }
@@ -33,7 +29,6 @@ export default function CenterControl({
   tentativePlacementIndex,
   placementCorrect,
   onPlay,
-  onDoneListening,
   onConfirmPlacement,
   onNextTurn,
 }: Props) {
@@ -43,23 +38,13 @@ export default function CenterControl({
       style={{ '--player-color': currentPlayer.color } as React.CSSProperties}
     >
       {phase === GAME_PHASE.IDLE && (
-        <IdleView
-          currentPlayer={currentPlayer}
-          onPlay={onPlay}
-        />
+        <IdleView currentPlayer={currentPlayer} onPlay={onPlay} />
       )}
 
       {phase === GAME_PHASE.PLAYING && currentSong && (
         <PlayingView
           currentSong={currentSong}
           playerColor={currentPlayer.color}
-          onDoneListening={onDoneListening}
-        />
-      )}
-
-      {phase === GAME_PHASE.PLACING && (
-        <PlacingView
-          currentPlayer={currentPlayer}
           hasSelection={tentativePlacementIndex !== null}
           onConfirmPlacement={onConfirmPlacement}
         />
@@ -105,9 +90,10 @@ function IdleView({ currentPlayer, onPlay }: IdleViewProps) {
 interface PlayingViewProps {
   currentSong: Song;
   playerColor: string;
-  onDoneListening: () => void;
+  hasSelection: boolean;
+  onConfirmPlacement: () => void;
 }
-function PlayingView({ currentSong, playerColor, onDoneListening }: PlayingViewProps) {
+function PlayingView({ currentSong, playerColor, hasSelection, onConfirmPlacement }: PlayingViewProps) {
   return (
     <div className={styles.playingView}>
       {currentSong.previewUrl ? (
@@ -116,10 +102,14 @@ function PlayingView({ currentSong, playerColor, onDoneListening }: PlayingViewP
         <p className={styles.noPreview}>No preview available for this song.</p>
       )}
       <p className={styles.instruction}>
-        Listen to the preview, then click when you're ready to place it.
+        Pick a spot on your timeline, then lock it in.
       </p>
-      <button className={styles.doneButton} onClick={onDoneListening}>
-        Done Listening →
+      <button
+        className={styles.lockButton}
+        onClick={onConfirmPlacement}
+        disabled={!hasSelection}
+      >
+        Lock In ✓
       </button>
     </div>
   );
