@@ -272,8 +272,8 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-p4); }
-.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-p1); }
+.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-right); }
+.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-wrong); }
 
 .resultIcon { font-size: 32px; line-height: 1; }
 
@@ -283,8 +283,8 @@
   letter-spacing: 2px;
 }
 
-.resultCorrect .resultText { color: var(--color-p4); }
-.resultWrong   .resultText { color: var(--color-p1); }
+.resultCorrect .resultText { color: var(--color-right); }
+.resultWrong   .resultText { color: var(--color-wrong); }
 
 .resultYear {
   font-family: var(--font-display);
@@ -293,8 +293,8 @@
   letter-spacing: 2px;
 }
 
-.resultCorrect .resultYear { color: var(--color-p4); }
-.resultWrong   .resultYear { color: var(--color-p1); }
+.resultCorrect .resultYear { color: var(--color-right); }
+.resultWrong   .resultYear { color: var(--color-wrong); }
 
 .nextButton {
   padding: 14px 32px;

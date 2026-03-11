@@ -48,7 +48,7 @@ export default function App() {
   if (loadError) {
     return (
       <div style={errorContainerStyle}>
-        <h2 style={{ color: 'var(--color-p1)' }}>Failed to load</h2>
+        <h2 style={{ color: 'var(--color-wrong)' }}>Failed to load</h2>
         <p>{loadError}</p>
         <p style={{ color: 'var(--color-text-muted)' }}>
           Make sure the server is running on port 3001.

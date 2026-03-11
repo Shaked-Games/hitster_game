@@ -8,10 +8,13 @@
   --color-text-muted:  rgba(240, 238, 232, 0.45);
 
   /* Player accent colors */
-  --color-p1: #ff3566;
+  --color-p1: #ff8c00;
   --color-p2: #00c8ff;
   --color-p3: #ffd200;
-  --color-p4: #00e87a;
+  --color-p4: #a855f7;
+
+  --color-right: #00e87a;
+  --color-wrong: #ff3566;
 
   /* Layout sizes */
   --zone-height:      170px;

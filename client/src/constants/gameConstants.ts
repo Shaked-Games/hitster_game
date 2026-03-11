@@ -31,10 +31,10 @@ export const PLAYER_POSITIONS: readonly PlayerPosition[] = [
 
 /** CSS custom-property accent color for each player (indexed 0–3). */
 export const PLAYER_COLORS: readonly string[] = [
-  'var(--color-p1)', // Player 1 – pink/red
+  'var(--color-p1)', // Player 1 – orange
   'var(--color-p2)', // Player 2 – cyan
   'var(--color-p3)', // Player 3 – yellow
-  'var(--color-p4)', // Player 4 – green
+  'var(--color-p4)', // Player 4 – purple
 ] as const;
 
 export const PLAYER_DEFAULT_NAMES: readonly string[] = [

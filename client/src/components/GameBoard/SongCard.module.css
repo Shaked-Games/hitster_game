@@ -90,7 +90,7 @@
 }
 
 .cardWrong {
-  box-shadow: 0 0 0 2px var(--color-p1), 0 4px 24px rgba(255,53,102,0.35);
+  box-shadow: 0 0 0 2px var(--color-wrong), 0 4px 24px rgba(255,53,102,0.35);
   animation: shake 0.5s ease;
 }
 
