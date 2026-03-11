@@ -58,7 +58,7 @@ export interface GameState {
 
 export interface GameActions {
   initializeGame: (playerCount: number, songs: Song[]) => void;
-  playSong: () => void;
+  playSong: () => Promise<void>;
   selectPlacement: (slotIndex: number) => void;
   confirmPlacement: () => void;
   advanceTurn: () => void;

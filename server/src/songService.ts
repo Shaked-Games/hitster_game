@@ -1,10 +1,7 @@
 /**
  * songService.ts
- * Loads songs from the CSV file and enriches them with Deezer preview URLs.
- *
- * Deezer's API is free and requires no authentication.
- * We search by "track artist" and take the first result's preview URL.
- * Results are cached after the first load.
+ * Loads songs from the CSV file. Deezer preview URLs are fetched
+ * on-demand per song so they are always fresh (URLs expire quickly).
  */
 
 import { readFile, writeFile } from 'fs/promises';
@@ -15,14 +12,10 @@ import { randomUUID } from 'crypto';
 import type { SongWithPreview, CsvSongRow, DeezerSearchResponse } from './types';
 
 const SONGS_CSV_PATH = join(__dirname, '..', 'songs_list.csv');
-
-/** Deezer public search endpoint — no auth required */
 const DEEZER_SEARCH_URL = 'https://api.deezer.com/search';
 
-/** Milliseconds to wait between Deezer requests to avoid rate limiting */
-const DEEZER_REQUEST_DELAY_MS = 200;
-
-let cachedSongs: SongWithPreview[] | null = null;
+/** Base song data cached after first CSV load — no preview URLs stored */
+let cachedBaseSongs: Omit<SongWithPreview, 'previewUrl'>[] | null = null;
 
 // ── Parsing ────────────────────────────────────────────────────────────────────
 
@@ -44,22 +37,17 @@ function isValidSong(song: Omit<SongWithPreview, 'previewUrl'>): boolean {
   );
 }
 
-// ── Deezer Integration ────────────────────────────────────────────────────────
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+// ── Deezer ─────────────────────────────────────────────────────────────────────
 
 /**
- * Searches Deezer for a track and returns the 30s preview MP3 URL.
- * Returns an empty string if no result is found.
+ * Fetches a fresh 30s preview URL from Deezer for a single track.
+ * Called per-song when the route builds the response.
  */
-async function fetchDeezerPreview(name: string, artist: string): Promise<string> {
+export async function fetchDeezerPreview(name: string, artist: string): Promise<string> {
   try {
     const query = encodeURIComponent(`${name} ${artist}`);
     const res = await fetch(`${DEEZER_SEARCH_URL}?q=${query}&limit=1`);
     if (!res.ok) return '';
-
     const data: DeezerSearchResponse = await res.json();
     return data.data?.[0]?.preview ?? '';
   } catch {
@@ -70,11 +58,11 @@ async function fetchDeezerPreview(name: string, artist: string): Promise<string>
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
- * Loads songs from CSV, enriches each with a Deezer preview URL, and caches.
- * This will make N HTTP requests to Deezer on first load (one per song).
+ * Loads and caches base song data (no preview URLs) from the CSV.
+ * Skips rows marked as used.
  */
-export async function loadSongs(): Promise<SongWithPreview[]> {
-  if (cachedSongs) return cachedSongs;
+export async function loadSongs(): Promise<Omit<SongWithPreview, 'previewUrl'>[]> {
+  if (cachedBaseSongs) return cachedBaseSongs;
 
   console.log('📖 Loading songs from CSV…');
 
@@ -85,30 +73,17 @@ export async function loadSongs(): Promise<SongWithPreview[]> {
     trim: true,
   });
 
-  const baseSongs = rows
+  cachedBaseSongs = rows
+    .filter((row) => row.used !== 'true')
     .map(parseSongRow)
-    .filter(isValidSong)
-    .filter((_, i) => rows[i].used !== 'true');  // skip already-used songs
+    .filter(isValidSong);
 
-  console.log(`🎵 Fetching Deezer previews for ${baseSongs.length} songs…`);
-
-  const songsWithPreviews: SongWithPreview[] = [];
-  for (const song of baseSongs) {
-    const previewUrl = await fetchDeezerPreview(song.name, song.artist);
-    songsWithPreviews.push({ ...song, previewUrl });
-    await delay(DEEZER_REQUEST_DELAY_MS);
-  }
-
-  const found = songsWithPreviews.filter((s) => s.previewUrl).length;
-  console.log(`✅ Previews found: ${found}/${baseSongs.length}`);
-
-  cachedSongs = songsWithPreviews;
-  return cachedSongs;
+  console.log(`✅ ${cachedBaseSongs.length} songs available`);
+  return cachedBaseSongs;
 }
 
 /**
- * Marks a song as used in the CSV by name+artist match.
- * Clears the in-memory cache so the next game load picks it up.
+ * Marks a song as used in the CSV. Clears the in-memory cache.
  */
 export async function markSongUsed(name: string, artist: string): Promise<void> {
   const rawCsv = await readFile(SONGS_CSV_PATH, 'utf-8');
@@ -136,6 +111,6 @@ export async function markSongUsed(name: string, artist: string): Promise<void> 
       columns: ['name', 'artist', 'year', 'used'],
     });
     await writeFile(SONGS_CSV_PATH, output, 'utf-8');
-    cachedSongs = null; // bust cache so next game reloads without this song
+    cachedBaseSongs = null;
   }
 }

@@ -15,13 +15,14 @@ import {
   ANCHOR_YEAR,
 } from '../constants/gameConstants';
 import type { GameState, GameActions, GamePhase, Player, Song } from '../types';
-import { markSongUsed as apiMarkSongUsed } from '../services/api';
+import { markSongUsed as apiMarkSongUsed, fetchPreview } from '../services/api';
 
 // ── Reducer Action Types ───────────────────────────────────────────────────────
 
 type GameAction =
   | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[] } }
   | { type: 'PLAY_SONG' }
+  | { type: 'SET_PREVIEW_URL'; payload: { previewUrl: string } }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
   | { type: 'CONFIRM_PLACEMENT' }
   | { type: 'ADVANCE_TURN' };
@@ -138,6 +139,13 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case ACTION.PLAY_SONG:
       return { ...state, phase: GAME_PHASE.PLAYING };
 
+    case 'SET_PREVIEW_URL':
+      if (!state.currentSong) return state;
+      return {
+        ...state,
+        currentSong: { ...state.currentSong, previewUrl: action.payload.previewUrl },
+      };
+
     case ACTION.SELECT_PLACEMENT:
       return { ...state, tentativePlacementIndex: action.payload.slotIndex };
 
@@ -215,13 +223,21 @@ function gameReducer(state: GameState, action: GameAction): GameState {
  */
 export function useGameState(): { state: GameState; actions: GameActions } {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
+  const stateRef = { current: state };
+  stateRef.current = state;
 
   const actions: GameActions = {
     initializeGame: (playerCount, songs) =>
       dispatch({ type: ACTION.INITIALIZE_GAME, payload: { playerCount, songs } }),
 
-    playSong: () =>
-      dispatch({ type: ACTION.PLAY_SONG }),
+    playSong: async () => {
+      const song = stateRef.current.currentSong;
+      dispatch({ type: ACTION.PLAY_SONG });
+      if (song) {
+        const previewUrl = await fetchPreview(song.name, song.artist);
+        dispatch({ type: 'SET_PREVIEW_URL', payload: { previewUrl } });
+      }
+    },
 
     selectPlacement: (slotIndex) =>
       dispatch({ type: ACTION.SELECT_PLACEMENT, payload: { slotIndex } }),

@@ -99,7 +99,10 @@ function PlayingView({ currentSong, playerColor, hasSelection, onConfirmPlacemen
       {currentSong.previewUrl ? (
         <AudioPlayer src={currentSong.previewUrl} playerColor={playerColor} />
       ) : (
-        <p className={styles.noPreview}>No preview available for this song.</p>
+        <div className={styles.audioLoading}>
+          <div className={styles.audioSpinner} />
+          <span>Loading preview…</span>
+        </div>
       )}
       <p className={styles.instruction}>
         Pick a spot on your timeline, then lock it in.

@@ -21,8 +21,15 @@ export async function fetchSongs(): Promise<Song[]> {
 }
 
 /**
- * Marks a song as used in the server CSV so it won't be picked again.
+ * Fetches a fresh Deezer preview URL for a single song, just before playback.
  */
+export async function fetchPreview(name: string, artist: string): Promise<string> {
+  const params = new URLSearchParams({ name, artist });
+  const res = await fetch(`${API_BASE}/songs/preview?${params}`);
+  if (!res.ok) return '';
+  const data: { previewUrl: string } = await res.json();
+  return data.previewUrl ?? '';
+}
 export async function markSongUsed(name: string, artist: string): Promise<void> {
   await fetch(`${API_BASE}/songs/mark-used`, {
     method: 'POST',
