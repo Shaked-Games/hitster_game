@@ -1,9 +1,3 @@
-/**
- * useGameState.ts
- * Central game-state management via useReducer.
- * All game logic lives in pure functions outside the reducer for testability.
- */
-
 import { useReducer } from 'react';
 import {
   GAME_PHASE,
@@ -17,17 +11,13 @@ import {
 import type { GameState, GameActions, GamePhase, Player, Song } from '../types';
 import { markSongUsed as apiMarkSongUsed, fetchPreview } from '../services/api';
 
-// ── Reducer Action Types ───────────────────────────────────────────────────────
-
 type GameAction =
-  | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[] } }
+  | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[]; playlist: string } }
   | { type: 'PLAY_SONG' }
   | { type: 'SET_PREVIEW_URL'; payload: { previewUrl: string } }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
   | { type: 'CONFIRM_PLACEMENT' }
   | { type: 'ADVANCE_TURN' };
-
-// ── Initial State ──────────────────────────────────────────────────────────────
 
 const INITIAL_STATE: GameState = {
   phase: GAME_PHASE.SETUP as GamePhase,
@@ -39,13 +29,9 @@ const INITIAL_STATE: GameState = {
   winner: null,
   usedSongIds: [],
   allSongs: [],
+  playlist: '',
 };
 
-// ── Pure Helper Functions ──────────────────────────────────────────────────────
-
-/**
- * Returns a random song that hasn't been used yet, or null if none remain.
- */
 function pickUnusedSong(allSongs: Song[], usedSongIds: string[]): Song | null {
   const usedSet = new Set(usedSongIds);
   const available = allSongs.filter((s) => !usedSet.has(s.id));
@@ -53,39 +39,19 @@ function pickUnusedSong(allSongs: Song[], usedSongIds: string[]): Song | null {
   return available[Math.floor(Math.random() * available.length)];
 }
 
-/**
- * Inserts a song into a timeline array at the given index.
- * Does NOT mutate the original array.
- */
 function insertAtIndex(timeline: Song[], song: Song, index: number): Song[] {
   const copy = [...timeline];
   copy.splice(index, 0, song);
   return copy;
 }
 
-/**
- * Returns true if placing `song` at `slotIndex` within `timeline` is
- * chronologically correct (i.e. year fits between surrounding cards).
- *
- * slotIndex === 0 means "before all cards".
- * slotIndex === timeline.length means "after all cards".
- */
-function isPlacementCorrect(
-  timeline: Song[],
-  song: Song,
-  slotIndex: number,
-): boolean {
+function isPlacementCorrect(timeline: Song[], song: Song, slotIndex: number): boolean {
   const before = timeline[slotIndex - 1];
   const after  = timeline[slotIndex];
-  const fitsAfterPrev  = before == null || before.year <= song.year;
-  const fitsBeforeNext = after  == null || song.year  <= after.year;
-  return fitsAfterPrev && fitsBeforeNext;
+  return (before == null || before.year <= song.year) &&
+         (after  == null || song.year  <= after.year);
 }
 
-/**
- * The shared anchor card placed on every player's timeline at game start.
- * It shows only the year — no song name or artist.
- */
 const ANCHOR_CARD: Song = {
   id: 'anchor',
   name: '',
@@ -94,10 +60,6 @@ const ANCHOR_CARD: Song = {
   previewUrl: '',
 };
 
-/**
- * Creates a Player object for the given index with the anchor card as the
- * starting timeline entry.
- */
 function createPlayer(index: number): Player {
   return {
     id: index,
@@ -108,23 +70,14 @@ function createPlayer(index: number): Player {
   };
 }
 
-// ── Reducer ────────────────────────────────────────────────────────────────────
-
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
 
     case ACTION.INITIALIZE_GAME: {
-      const { playerCount, songs } = action.payload;
-
-      // All players start with the same anchor card — no songs consumed
-      const players: Player[] = Array.from({ length: playerCount }, (_, i) =>
-        createPlayer(i),
-      );
-
-      // Pick the first song for Player 0's turn
+      const { playerCount, songs, playlist } = action.payload;
+      const players = Array.from({ length: playerCount }, (_, i) => createPlayer(i));
       const firstSong = pickUnusedSong(songs, []);
       const usedSongIds = firstSong ? [firstSong.id] : [];
-
       return {
         ...INITIAL_STATE,
         phase: GAME_PHASE.IDLE,
@@ -133,6 +86,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         currentSong: firstSong,
         usedSongIds,
         allSongs: songs,
+        playlist,
       };
     }
 
@@ -152,7 +106,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case ACTION.CONFIRM_PLACEMENT: {
       const { players, currentPlayerIndex, currentSong, tentativePlacementIndex } = state;
       if (currentSong === null || tentativePlacementIndex === null) return state;
-
       const correct = isPlacementCorrect(
         players[currentPlayerIndex].timeline,
         currentSong,
@@ -163,17 +116,11 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
     case ACTION.ADVANCE_TURN: {
       const {
-        players,
-        currentPlayerIndex,
-        currentSong,
-        tentativePlacementIndex,
-        placementCorrect,
-        allSongs,
+        players, currentPlayerIndex, currentSong,
+        tentativePlacementIndex, placementCorrect, allSongs,
       } = state;
-
       if (currentSong === null || tentativePlacementIndex === null) return state;
 
-      // Update the active player's timeline if placement was correct
       const updatedPlayers = players.map((player, idx): Player => {
         if (idx !== currentPlayerIndex || !placementCorrect) return player;
         return {
@@ -182,7 +129,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         };
       });
 
-      // Check win condition
       if (updatedPlayers[currentPlayerIndex].timeline.length >= WINNING_CARD_COUNT) {
         return {
           ...state,
@@ -192,12 +138,9 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         };
       }
 
-      // Advance clockwise to the next player
       const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
       const nextSong = pickUnusedSong(allSongs, state.usedSongIds);
-      const newUsedIds = nextSong
-        ? [...state.usedSongIds, nextSong.id]
-        : state.usedSongIds;
+      const newUsedIds = nextSong ? [...state.usedSongIds, nextSong.id] : state.usedSongIds;
 
       return {
         ...state,
@@ -216,19 +159,14 @@ function gameReducer(state: GameState, action: GameAction): GameState {
   }
 }
 
-// ── Public Hook ────────────────────────────────────────────────────────────────
-
-/**
- * Exposes the full game state and all dispatched actions.
- */
 export function useGameState(): { state: GameState; actions: GameActions } {
   const [state, dispatch] = useReducer(gameReducer, INITIAL_STATE);
   const stateRef = { current: state };
   stateRef.current = state;
 
   const actions: GameActions = {
-    initializeGame: (playerCount, songs) =>
-      dispatch({ type: ACTION.INITIALIZE_GAME, payload: { playerCount, songs } }),
+    initializeGame: (playerCount, songs, playlist) =>
+      dispatch({ type: ACTION.INITIALIZE_GAME, payload: { playerCount, songs, playlist } }),
 
     playSong: async () => {
       const song = stateRef.current.currentSong;
@@ -248,7 +186,8 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),
 
-    markSongUsed: (name, artist) => apiMarkSongUsed(name, artist),
+    markSongUsed: (playlist, name, artist) =>
+      apiMarkSongUsed(playlist, name, artist),
   };
 
   return { state, actions };

@@ -1,20 +1,17 @@
-/**
- * routes/songs.ts
- * REST endpoint for song data.
- *
- * GET /api/songs  →  { songs: SongWithPreview[] }
- */
-
 import { Router, Request, Response } from 'express';
 import { loadSongs, markSongUsed, fetchDeezerPreview } from '../songService';
 import type { SongWithPreview } from '../types';
 
 const router = Router();
 
-router.get('/', async (_req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
+  const playlist = (req.query.playlist as string | undefined)?.trim();
+  if (!playlist) {
+    res.status(400).json({ error: 'playlist query param is required' });
+    return;
+  }
   try {
-    const baseSongs = await loadSongs();
-    // Return songs without preview URLs — fetched on-demand when played
+    const baseSongs = await loadSongs(playlist);
     const songs: SongWithPreview[] = baseSongs.map((song) => ({ ...song, previewUrl: '' }));
     res.json({ songs });
   } catch (err) {
@@ -39,13 +36,17 @@ router.get('/preview', async (req: Request, res: Response) => {
 });
 
 router.post('/mark-used', async (req: Request, res: Response) => {
-  const { name, artist } = req.body as { name?: string; artist?: string };
-  if (!name || !artist) {
-    res.status(400).json({ error: 'name and artist are required' });
+  const { playlist, name, artist } = req.body as {
+    playlist?: string;
+    name?: string;
+    artist?: string;
+  };
+  if (!playlist || !name || !artist) {
+    res.status(400).json({ error: 'playlist, name and artist are required' });
     return;
   }
   try {
-    await markSongUsed(name, artist);
+    await markSongUsed(playlist, name, artist);
     res.json({ ok: true });
   } catch (err) {
     console.error('Failed to mark song as used:', err);

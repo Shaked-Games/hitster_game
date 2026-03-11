@@ -11,11 +11,11 @@ import { join } from 'path';
 import { randomUUID } from 'crypto';
 import type { SongWithPreview, CsvSongRow, DeezerSearchResponse } from './types';
 
-const SONGS_CSV_PATH = join(__dirname, '..', 'songs_list.csv');
+const SONGS_DIR = join(__dirname, '..', 'songs');
 const DEEZER_SEARCH_URL = 'https://api.deezer.com/search';
 
-/** Base song data cached after first CSV load — no preview URLs stored */
-let cachedBaseSongs: Omit<SongWithPreview, 'previewUrl'>[] | null = null;
+/** Cache per playlist name */
+const cache = new Map<string, Omit<SongWithPreview, 'previewUrl'>[]>();
 
 // ── Parsing ────────────────────────────────────────────────────────────────────
 
@@ -58,35 +58,38 @@ export async function fetchDeezerPreview(name: string, artist: string): Promise<
 // ── Public API ─────────────────────────────────────────────────────────────────
 
 /**
- * Loads and caches base song data (no preview URLs) from the CSV.
+ * Loads and caches base song data (no preview URLs) from a playlist CSV.
  * Skips rows marked as used.
  */
-export async function loadSongs(): Promise<Omit<SongWithPreview, 'previewUrl'>[]> {
-  if (cachedBaseSongs) return cachedBaseSongs;
+export async function loadSongs(playlist: string): Promise<Omit<SongWithPreview, 'previewUrl'>[]> {
+  if (cache.has(playlist)) return cache.get(playlist)!;
 
-  console.log('📖 Loading songs from CSV…');
+  const csvPath = join(SONGS_DIR, `${playlist}.csv`);
+  console.log(`📖 Loading playlist "${playlist}"…`);
 
-  const rawCsv = await readFile(SONGS_CSV_PATH, 'utf-8');
+  const rawCsv = await readFile(csvPath, 'utf-8');
   const rows: CsvSongRow[] = parse(rawCsv, {
     columns: true,
     skip_empty_lines: true,
     trim: true,
   });
 
-  cachedBaseSongs = rows
+  const songs = rows
     .filter((row) => row.used !== 'true')
     .map(parseSongRow)
     .filter(isValidSong);
 
-  console.log(`✅ ${cachedBaseSongs.length} songs available`);
-  return cachedBaseSongs;
+  console.log(`✅ ${songs.length} songs available in "${playlist}"`);
+  cache.set(playlist, songs);
+  return songs;
 }
 
 /**
- * Marks a song as used in the CSV. Clears the in-memory cache.
+ * Marks a song as used in the playlist CSV. Clears the cache for that playlist.
  */
-export async function markSongUsed(name: string, artist: string): Promise<void> {
-  const rawCsv = await readFile(SONGS_CSV_PATH, 'utf-8');
+export async function markSongUsed(playlist: string, name: string, artist: string): Promise<void> {
+  const csvPath = join(SONGS_DIR, `${playlist}.csv`);
+  const rawCsv = await readFile(csvPath, 'utf-8');
   const rows: CsvSongRow[] = parse(rawCsv, {
     columns: true,
     skip_empty_lines: true,
@@ -110,7 +113,7 @@ export async function markSongUsed(name: string, artist: string): Promise<void> 
       header: true,
       columns: ['name', 'artist', 'year', 'used'],
     });
-    await writeFile(SONGS_CSV_PATH, output, 'utf-8');
-    cachedBaseSongs = null;
+    await writeFile(csvPath, output, 'utf-8');
+    cache.delete(playlist);
   }
 }

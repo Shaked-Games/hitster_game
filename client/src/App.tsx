@@ -1,11 +1,5 @@
-/**
- * App.tsx
- * Root component. Loads songs on mount and routes between screens
- * based on the current game phase.
- */
-
 import { useState, useEffect, CSSProperties } from 'react';
-import { fetchSongs } from './services/api';
+import { fetchPlaylists, fetchSongs } from './services/api';
 import { useGameState } from './hooks/useGameState';
 import { GAME_PHASE } from './constants/gameConstants';
 import type { Song } from './types';
@@ -17,33 +11,44 @@ import React from 'react';
 export default function App() {
   const { state, actions } = useGameState();
 
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const [playlists, setPlaylists]               = useState<string[]>([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState<string>('');
+  const [starting, setStarting]                 = useState(false);
+  const [loadError, setLoadError]               = useState<string | null>(null);
 
-  // Load song list once on mount – it never changes during a session
+  // Load playlist names on mount only
   useEffect(() => {
-    fetchSongs()
-      .then(setSongs)
+    fetchPlaylists()
+      .then((names) => {
+        setPlaylists(names);
+        if (names.length > 0) setSelectedPlaylist(names[0]);
+      })
       .catch((err: Error) => setLoadError(err.message));
   }, []);
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
-
-  function handleStart(playerCount: number): void {
-    if (songs.length === 0) return;
-    actions.initializeGame(playerCount, songs);
+  async function handleStart(playerCount: number): Promise<void> {
+    if (!selectedPlaylist || starting) return;
+    setStarting(true);
+    try {
+      const songs = await fetchSongs(selectedPlaylist);
+      actions.initializeGame(playerCount, songs, selectedPlaylist);
+    } catch (err) {
+      setLoadError((err as Error).message);
+    } finally {
+      setStarting(false);
+    }
   }
 
-  function handlePlayAgain(): void {
-    actions.initializeGame(state.players.length, songs);
+  async function handlePlayAgain(): Promise<void> {
+    if (!selectedPlaylist) return;
+    const songs = await fetchSongs(selectedPlaylist);
+    actions.initializeGame(state.players.length, songs, selectedPlaylist);
   }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
 
   if (loadError) {
     return (
       <div style={errorContainerStyle}>
-        <h2 style={{ color: 'var(--color-p1)' }}>Failed to load songs</h2>
+        <h2 style={{ color: 'var(--color-p1)' }}>Failed to load</h2>
         <p>{loadError}</p>
         <p style={{ color: 'var(--color-text-muted)' }}>
           Make sure the server is running on port 3001.
@@ -55,8 +60,11 @@ export default function App() {
   if (state.phase === GAME_PHASE.SETUP) {
     return (
       <PlayerSetup
+        playlists={playlists}
+        selectedPlaylist={selectedPlaylist}
+        onSelectPlaylist={setSelectedPlaylist}
         onStart={handleStart}
-        songsLoaded={songs.length > 0}
+        starting={starting}
       />
     );
   }

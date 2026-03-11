@@ -139,6 +139,42 @@
   cursor: not-allowed;
 }
 
+.selectWrapper {
+  position: relative;
+  width: 100%;
+}
+
+.playlistSelect {
+  width: 100%;
+  padding: 14px 40px 14px 16px;
+  background: var(--color-surface-2);
+  border: 2px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--color-text);
+  appearance: none;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  outline: none;
+}
+
+.playlistSelect:hover,
+.playlistSelect:focus {
+  border-color: #7b2fff;
+}
+
+.selectArrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-muted);
+  pointer-events: none;
+  font-size: 14px;
+}
+
 .hint {
   font-size: 13px;
   color: var(--color-text-muted);

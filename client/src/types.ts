@@ -52,15 +52,16 @@ export interface GameState {
   winner: Player | null;
   usedSongIds: string[];
   allSongs: Song[];
+  playlist: string;
 }
 
 // ── Actions ────────────────────────────────────────────────────────────────────
 
 export interface GameActions {
-  initializeGame: (playerCount: number, songs: Song[]) => void;
+  initializeGame: (playerCount: number, songs: Song[], playlist: string) => void;
   playSong: () => Promise<void>;
   selectPlacement: (slotIndex: number) => void;
   confirmPlacement: () => void;
   advanceTurn: () => void;
-  markSongUsed: (songName: string, artistName: string) => Promise<void>;
+  markSongUsed: (playlist: string, songName: string, artistName: string) => Promise<void>;
 }

@@ -21,6 +21,7 @@ import { POSITIONS_BY_PLAYER_COUNT } from '../../constants/gameConstants';
 import PlayerZone from './PlayerZone';
 import CenterControl from './CenterControl';
 import styles from './GameBoard.module.css';
+import React from 'react';
 
 interface Props {
   state: GameState;
@@ -57,7 +58,7 @@ export default function GameBoard({ state, actions }: Props) {
 
   function handleNextTurn() {
     if (currentSong) {
-      actions.markSongUsed(currentSong.name, currentSong.artist);
+      actions.markSongUsed(state.playlist, currentSong.name, currentSong.artist);
     }
     actions.advanceTurn();
   }
