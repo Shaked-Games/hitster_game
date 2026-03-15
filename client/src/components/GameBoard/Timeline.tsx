@@ -88,7 +88,7 @@ function TimelineSlot({
   vertical,
 }: SlotProps) {
   const showRevealCard =
-    isRevealing && tentativePlacementIndex === slotIdx && currentSong !== null;
+    isRevealing && tentativePlacementIndex === slotIdx && currentSong !== null && placementCorrect === false;
 
   const slotClass = [
     vertical ? styles.slotVertical : styles.slot,
@@ -133,6 +133,7 @@ function TimelineSlot({
           song={timelineCard}
           playerColor={playerColor}
           isAnchor={timelineCard.name === ''}
+          isCorrect={isRevealing && placementCorrect === true && slotIdx === (tentativePlacementIndex ?? -1)}
         />
       )}
     </>

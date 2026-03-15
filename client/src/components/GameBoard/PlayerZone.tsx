@@ -2,6 +2,7 @@ import React from 'react';
 import type { Player, Song, PlayerPosition } from '../../types';
 import Timeline from './Timeline';
 import styles from './PlayerZone.module.css';
+import { WINNING_CARD_COUNT } from '../../constants/gameConstants';
 
 interface Props {
   player: Player;
@@ -36,7 +37,7 @@ export default function PlayerZone({
         <div className={styles.header}>
           <div className={styles.colorDot} style={{ background: player.color }} />
           <span className={styles.playerName}>{player.name}</span>
-          <span className={styles.cardCount}>{player.timeline.length} / 10</span>
+          <span className={styles.cardCount}>{player.timeline.length} / {WINNING_CARD_COUNT}</span>
         </div>
 
         <Timeline

@@ -17,6 +17,7 @@ type GameAction =
   | { type: 'SET_PREVIEW_URL'; payload: { previewUrl: string } }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
   | { type: 'CONFIRM_PLACEMENT' }
+  | { type: 'RESET_TO_SETUP' }
   | { type: 'ADVANCE_TURN' };
 
 const INITIAL_STATE: GameState = {
@@ -71,6 +72,9 @@ function createPlayer(index: number, anchorYear: number): Player {
 
 function gameReducer(state: GameState, action: GameAction): GameState {
   switch (action.type) {
+
+    case ACTION.RESET_TO_SETUP:
+      return INITIAL_STATE;
 
     case ACTION.INITIALIZE_GAME: {
       const { playerCount, songs, playlist } = action.payload;
@@ -206,6 +210,9 @@ export function useGameState(): { state: GameState; actions: GameActions } {
 
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),
+
+    resetToSetup: () =>
+      dispatch({ type: ACTION.RESET_TO_SETUP }),
 
     markSongUsed: (playlist, name, artist) => {
       localMarkSongUsed(playlist, name, artist);

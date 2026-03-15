@@ -64,5 +64,6 @@ export interface GameActions {
   selectPlacement: (slotIndex: number) => void;
   confirmPlacement: () => void;
   advanceTurn: () => void;
+  resetToSetup: () => void;
   markSongUsed: (playlist: string, songName: string, artistName: string) => Promise<void>;
 }

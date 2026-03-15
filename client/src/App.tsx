@@ -2,7 +2,6 @@ import { useState, useEffect, CSSProperties } from 'react';
 import { fetchPlaylists, fetchSongs } from './services/api';
 import { useGameState } from './hooks/useGameState';
 import { GAME_PHASE } from './constants/gameConstants';
-import type { Song } from './types';
 import PlayerSetup from './components/PlayerSetup/PlayerSetup';
 import GameBoard from './components/GameBoard/GameBoard';
 import WinScreen from './components/WinScreen/WinScreen';
@@ -40,9 +39,7 @@ export default function App() {
   }
 
   async function handlePlayAgain(): Promise<void> {
-    if (!selectedPlaylist) return;
-    const songs = await fetchSongs(selectedPlaylist);
-    actions.initializeGame(state.players.length, songs, selectedPlaylist);
+    actions.resetToSetup();
   }
 
   if (loadError) {

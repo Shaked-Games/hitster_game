@@ -4,6 +4,7 @@
  * Displays the winner, a ranked leaderboard, and a Play Again button.
  */
 
+import React from 'react';
 import type { Player } from '../../types';
 import styles from './WinScreen.module.css';
 
