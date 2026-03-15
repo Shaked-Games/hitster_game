@@ -64,7 +64,7 @@ function createPlayer(index: number, anchorYear: number): Player {
       artist: '',
       year: anchorYear,
       previewUrl: '',
-      csvPreviewUrl: '',
+      searchQuery: '',
     }],
   };
 }
@@ -113,12 +113,42 @@ function gameReducer(state: GameState, action: GameAction): GameState {
     case ACTION.CONFIRM_PLACEMENT: {
       const { players, currentPlayerIndex, currentSong, tentativePlacementIndex } = state;
       if (currentSong === null || tentativePlacementIndex === null) return state;
+
       const correct = isPlacementCorrect(
         players[currentPlayerIndex].timeline,
         currentSong,
         tentativePlacementIndex,
       );
-      return { ...state, phase: GAME_PHASE.REVEALING, placementCorrect: correct };
+
+      if (correct) {
+        const updatedTimeline = insertAtIndex(
+          players[currentPlayerIndex].timeline,
+          currentSong,
+          tentativePlacementIndex,
+        );
+        const updatedPlayers = players.map((p, i) =>
+          i === currentPlayerIndex ? { ...p, timeline: updatedTimeline } : p
+        );
+
+        if (updatedTimeline.length >= WINNING_CARD_COUNT) {
+          return {
+            ...state,
+            phase: GAME_PHASE.WON,
+            players: updatedPlayers,
+            winner: updatedPlayers[currentPlayerIndex],
+            placementCorrect: true,
+          };
+        }
+
+        return {
+          ...state,
+          phase: GAME_PHASE.REVEALING,
+          players: updatedPlayers,
+          placementCorrect: true,
+        };
+      }
+
+      return { ...state, phase: GAME_PHASE.REVEALING, placementCorrect: false };
     }
 
     case ACTION.ADVANCE_TURN: {
@@ -128,23 +158,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       } = state;
       if (currentSong === null || tentativePlacementIndex === null) return state;
 
-      const updatedPlayers = players.map((player, idx): Player => {
-        if (idx !== currentPlayerIndex || !placementCorrect) return player;
-        return {
-          ...player,
-          timeline: insertAtIndex(player.timeline, currentSong, tentativePlacementIndex),
-        };
-      });
-
-      if (updatedPlayers[currentPlayerIndex].timeline.length >= WINNING_CARD_COUNT) {
-        return {
-          ...state,
-          phase: GAME_PHASE.WON,
-          players: updatedPlayers,
-          winner: updatedPlayers[currentPlayerIndex],
-        };
-      }
-
+      // Card was already inserted into the timeline during CONFIRM_PLACEMENT if correct.
+      // Here we just advance to the next player.
       const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
       const nextSong = pickUnusedSong(allSongs, state.usedSongIds);
       const newUsedIds = nextSong ? [...state.usedSongIds, nextSong.id] : state.usedSongIds;
@@ -152,7 +167,6 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         phase: GAME_PHASE.IDLE,
-        players: updatedPlayers,
         currentPlayerIndex: nextPlayerIndex,
         currentSong: nextSong,
         tentativePlacementIndex: null,
@@ -179,7 +193,7 @@ export function useGameState(): { state: GameState; actions: GameActions } {
       const song = stateRef.current.currentSong;
       dispatch({ type: ACTION.PLAY_SONG });
       if (song) {
-        const previewUrl = await fetchPreview(song.name, song.artist, song.csvPreviewUrl, song.searchQuery);
+        const previewUrl = await fetchPreview(song.name, song.artist, song.searchQuery);
         dispatch({ type: 'SET_PREVIEW_URL', payload: { previewUrl } });
       }
     },

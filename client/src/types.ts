@@ -16,6 +16,7 @@ export interface Song {
   year: number;
   /** Direct MP3 URL for the 30-second Deezer preview. Empty string if not found. */
   previewUrl: string;
+  searchQuery: string;
 }
 
 /** One player's full state. */

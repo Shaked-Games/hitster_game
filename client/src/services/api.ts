@@ -16,8 +16,8 @@ export async function fetchSongs(playlist: string): Promise<Song[]> {
   return data.songs;
 }
 
-export async function fetchPreview(name: string, artist: string, csvPreviewUrl: string, searchQuery: string): Promise<string> {
-  const params = new URLSearchParams({ name, artist, csvPreviewUrl, searchQuery });
+export async function fetchPreview(name: string, artist: string, searchQuery: string): Promise<string> {
+  const params = new URLSearchParams({ name, artist, searchQuery });
   const res = await fetch(`${API_BASE}/songs/preview?${params}`);
   if (!res.ok) return '';
   const data: { previewUrl: string } = await res.json();

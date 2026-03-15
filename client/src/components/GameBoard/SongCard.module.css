@@ -30,7 +30,7 @@
 }
 
 .artist {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.8px;
   text-transform: uppercase;
@@ -56,8 +56,8 @@
 }
 
 .songName {
-  font-size: 9px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 700;
   color: var(--color-text);
   text-align: center;
   width: 100%;
@@ -72,8 +72,7 @@
 /* ── Anchor Card (year-only starting card) ───────────────────────────────────── */
 
 .cardAnchor {
-  border-style: dashed;
-  opacity: 0.7;
+  opacity: 1;
 }
 
 /* ── State Variants ──────────────────────────────────────────────────────────── */

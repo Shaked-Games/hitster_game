@@ -6,7 +6,6 @@
   overflow-y: hidden;
   padding: 8px;
   display: flex;
-  justify-content: center;
 }
 
 .timeline {
@@ -14,6 +13,7 @@
   flex-direction: row;
   align-items: center;
   gap: 6px;
+  margin: 0 auto;
 }
 
 /* ── Vertical (left / right) ─────────────────────────────────────────────────── */
@@ -26,7 +26,6 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .timelineVertical {
@@ -35,6 +34,7 @@
   align-items: center;
   gap: 6px;
   width: fit-content;
+  margin: auto 0;
 }
 
 /* ── Insertion Slot — horizontal ─────────────────────────────────────────────── */
