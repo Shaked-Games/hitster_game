@@ -8,7 +8,8 @@ import {
   WINNING_CARD_COUNT,
 } from '../constants/gameConstants';
 import type { GameState, GameActions, GamePhase, Player, Song } from '../types';
-import { markSongUsed as apiMarkSongUsed, fetchPreview } from '../services/api';
+import { fetchPreview } from '../services/api';
+import { markSongUsed as localMarkSongUsed, isSongUsed } from '../services/usedSongs';
 
 type GameAction =
   | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[]; playlist: string } }
@@ -63,6 +64,7 @@ function createPlayer(index: number, anchorYear: number): Player {
       artist: '',
       year: anchorYear,
       previewUrl: '',
+      csvPreviewUrl: '',
     }],
   };
 }
@@ -72,12 +74,16 @@ function gameReducer(state: GameState, action: GameAction): GameState {
 
     case ACTION.INITIALIZE_GAME: {
       const { playerCount, songs, playlist } = action.payload;
-      const years = songs.map((s) => s.year);
+      // Filter out songs already played by this browser for this playlist
+      const availableSongs = songs.filter((s) => !isSongUsed(playlist, s.name, s.artist));
+      const years = availableSongs.length > 0
+        ? availableSongs.map((s) => s.year)
+        : songs.map((s) => s.year);
       const players = Array.from({ length: playerCount }, (_, i) => {
         const anchorYear = years[Math.floor(Math.random() * years.length)];
         return createPlayer(i, anchorYear);
       });
-      const firstSong = pickUnusedSong(songs, []);
+      const firstSong = pickUnusedSong(availableSongs, []);
       const usedSongIds = firstSong ? [firstSong.id] : [];
       return {
         ...INITIAL_STATE,
@@ -86,7 +92,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         currentPlayerIndex: 0,
         currentSong: firstSong,
         usedSongIds,
-        allSongs: songs,
+        allSongs: availableSongs,
         playlist,
       };
     }
@@ -173,7 +179,7 @@ export function useGameState(): { state: GameState; actions: GameActions } {
       const song = stateRef.current.currentSong;
       dispatch({ type: ACTION.PLAY_SONG });
       if (song) {
-        const previewUrl = await fetchPreview(song.name, song.artist);
+        const previewUrl = await fetchPreview(song.name, song.artist, song.csvPreviewUrl, song.searchQuery);
         dispatch({ type: 'SET_PREVIEW_URL', payload: { previewUrl } });
       }
     },
@@ -187,8 +193,10 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),
 
-    markSongUsed: (playlist, name, artist) =>
-      apiMarkSongUsed(playlist, name, artist),
+    markSongUsed: (playlist, name, artist) => {
+      localMarkSongUsed(playlist, name, artist);
+      return Promise.resolve();
+    },
   };
 
   return { state, actions };

@@ -179,3 +179,126 @@
   font-size: 13px;
   color: var(--color-text-muted);
 }
+
+.rulesButton {
+  width: 100%;
+  padding: 13px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  transition: all 0.2s ease;
+  margin-top: -8px;
+}
+
+.rulesButton:hover {
+  border-color: rgba(255,255,255,0.3);
+  color: var(--color-text);
+}
+
+/* ── Modal ── */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal {
+  position: relative;
+  background: rgba(18, 18, 30, 0.98);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  padding: 40px 44px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.25s ease;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.6);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.modalClose {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 50%;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.modalClose:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--color-text);
+}
+
+.modalTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #7b2fff 0%, #3b8bff 50%, #00c8ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 28px;
+}
+
+.rulesList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rule {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.ruleIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.rule strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: 3px;
+  letter-spacing: 0.3px;
+}
+
+.rule p {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}

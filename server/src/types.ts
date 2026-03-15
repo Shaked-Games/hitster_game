@@ -11,8 +11,10 @@ export interface Song {
 }
 
 export interface SongWithPreview extends Song {
-  /** Direct MP3 URL for the 30-second Deezer preview. Empty string if not found. */
   previewUrl: string;
+  csvPreviewUrl: string;
+  /** Optional override for Deezer search (e.g. English transliteration of Hebrew title). */
+  searchQuery: string;
 }
 
 /** Raw row shape from the CSV parser */
@@ -20,7 +22,8 @@ export interface CsvSongRow {
   name: string;
   artist: string;
   year: string;
-  used?: string;
+  preview_url?: string;
+  search_query?: string;
 }
 
 /** Shape of a Deezer track search result we care about */

@@ -16,18 +16,10 @@ export async function fetchSongs(playlist: string): Promise<Song[]> {
   return data.songs;
 }
 
-export async function fetchPreview(name: string, artist: string): Promise<string> {
-  const params = new URLSearchParams({ name, artist });
+export async function fetchPreview(name: string, artist: string, csvPreviewUrl: string, searchQuery: string): Promise<string> {
+  const params = new URLSearchParams({ name, artist, csvPreviewUrl, searchQuery });
   const res = await fetch(`${API_BASE}/songs/preview?${params}`);
   if (!res.ok) return '';
   const data: { previewUrl: string } = await res.json();
   return data.previewUrl ?? '';
-}
-
-export async function markSongUsed(playlist: string, name: string, artist: string): Promise<void> {
-  await fetch(`${API_BASE}/songs/mark-used`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ playlist, name, artist }),
-  });
 }
