@@ -31,7 +31,12 @@ export async function loadSongs(playlist: string): Promise<Omit<SongWithPreview,
   console.log(`📖 Loading playlist "${playlist}"…`);
 
   const rawCsv = await readFile(csvPath, 'utf-8');
-  const rows: CsvSongRow[] = parse(rawCsv, { columns: true, skip_empty_lines: true, trim: true });
+  const rows: CsvSongRow[] = parse(rawCsv, { 
+    columns: true, 
+    skip_empty_lines: true, 
+    trim: true,
+    bom: true,
+  });
   const songs = rows.map(parseSongRow).filter(isValidSong);
 
   console.log(`✅ ${songs.length} songs in "${playlist}"`);
