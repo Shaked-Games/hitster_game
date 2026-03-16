@@ -71,7 +71,19 @@
   white-space: nowrap;
 }
 
-.cardCount {
+.counts {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.countItem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   font-family: var(--font-display);
   font-size: 18px;
   color: var(--color-text-muted);

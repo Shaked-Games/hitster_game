@@ -10,6 +10,7 @@ import React from 'react';
 import type { Player, Song } from '../../types';
 import { GAME_PHASE } from '../../constants/gameConstants';
 import styles from './CenterControl.module.css';
+import SongCard from './SongCard';
 
 interface Props {
   phase: string;
@@ -17,8 +18,9 @@ interface Props {
   currentSong: Song | null;
   tentativePlacementIndex: number | null;
   placementCorrect: boolean | null;
+  guessCorrect: boolean | null;
   onPlay: () => void;
-  onConfirmPlacement: () => void;
+  onConfirmPlacement: (nameGuess: string, artistGuess: string) => void;
   onNextTurn: () => void;
 }
 
@@ -28,6 +30,7 @@ export default function CenterControl({
   currentSong,
   tentativePlacementIndex,
   placementCorrect,
+  guessCorrect,
   onPlay,
   onConfirmPlacement,
   onNextTurn,
@@ -53,6 +56,7 @@ export default function CenterControl({
       {phase === GAME_PHASE.REVEALING && (
         <RevealingView
           placementCorrect={placementCorrect}
+          guessCorrect={guessCorrect}
           currentSong={currentSong}
           onNextTurn={onNextTurn}
         />
@@ -91,9 +95,12 @@ interface PlayingViewProps {
   currentSong: Song;
   playerColor: string;
   hasSelection: boolean;
-  onConfirmPlacement: () => void;
+  onConfirmPlacement: (nameGuess: string, artistGuess: string) => void;
 }
 function PlayingView({ currentSong, playerColor, hasSelection, onConfirmPlacement }: PlayingViewProps) {
+  const [nameGuess, setNameGuess]     = React.useState('');
+  const [artistGuess, setArtistGuess] = React.useState('');
+
   return (
     <div className={styles.playingView}>
       {currentSong.previewUrl ? (
@@ -104,12 +111,31 @@ function PlayingView({ currentSong, playerColor, hasSelection, onConfirmPlacemen
           <span>Loading preview…</span>
         </div>
       )}
-      <p className={styles.instruction}>
-        Pick a spot on your timeline, then lock it in.
-      </p>
+
+      <div className={styles.guessFields}>
+        <input
+          className={styles.guessInput}
+          type="text"
+          placeholder="Song name…"
+          value={nameGuess}
+          onChange={(e) => setNameGuess(e.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+        <input
+          className={styles.guessInput}
+          type="text"
+          placeholder="Artist…"
+          value={artistGuess}
+          onChange={(e) => setArtistGuess(e.target.value)}
+          autoComplete="off"
+          spellCheck={false}
+        />
+      </div>
+
       <button
         className={styles.lockButton}
-        onClick={onConfirmPlacement}
+        onClick={() => onConfirmPlacement(nameGuess, artistGuess)}
         disabled={!hasSelection}
       >
         Lock In ✓
@@ -262,30 +288,38 @@ function PlacingView({ currentPlayer, hasSelection, onConfirmPlacement }: Placin
 
 interface RevealingViewProps {
   placementCorrect: boolean | null;
+  guessCorrect: boolean | null;
   currentSong: Song | null;
   onNextTurn: () => void;
 }
-function RevealingView({ placementCorrect, currentSong, onNextTurn }: RevealingViewProps) {
+function RevealingView({ placementCorrect, guessCorrect, currentSong, onNextTurn }: RevealingViewProps) {
+  const isCorrect = placementCorrect === true;
+  const isWrong   = placementCorrect === false;
+
   return (
     <div className={styles.revealingView}>
-      {placementCorrect === true && (
-        <div className={`${styles.resultBanner} ${styles.resultCorrect}`}>
-          <span className={styles.resultIcon}>✓</span>
-          <span className={styles.resultText}>Correct!</span>
-          {currentSong && (
-            <span className={styles.resultYear}>{currentSong.year}</span>
-          )}
+      <div className={`${styles.resultBanner} ${isCorrect ? styles.resultCorrect : styles.resultWrong}`}>
+        <span className={styles.resultIcon}>{isCorrect ? '✓' : '✗'}</span>
+        <span className={styles.resultText}>{isCorrect ? 'Correct!' : 'Not quite!'}</span>
+      </div>
+
+      {guessCorrect !== null && (
+        <div className={`${styles.guessBanner} ${guessCorrect ? styles.guessCorrect : styles.guessWrong}`}>
+          {guessCorrect
+            ? <><span>🎉</span> You named the song! +1 chip</>
+            : <><span>🎵</span> Name / Artist incorrect</>
+          }
         </div>
       )}
-      {placementCorrect === false && (
-        <div className={`${styles.resultBanner} ${styles.resultWrong}`}>
-          <span className={styles.resultIcon}>✗</span>
-          <span className={styles.resultText}>Not quite!</span>
-          {currentSong && (
-            <span className={styles.resultYear}>{currentSong.year}</span>
-          )}
-        </div>
+
+      {currentSong && (
+        <SongCard
+          song={currentSong}
+          isCorrect={isCorrect}
+          isWrong={isWrong}
+        />
       )}
+
       <button className={styles.nextButton} onClick={onNextTurn}>
         Next Player →
       </button>

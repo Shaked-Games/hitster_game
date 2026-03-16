@@ -13,11 +13,11 @@ import { markSongUsed as localMarkSongUsed, isSongUsed } from '../services/usedS
 
 type GameAction =
   | { type: 'INITIALIZE_GAME'; payload: { playerCount: number; songs: Song[]; playlist: string } }
+  | { type: 'RESET_TO_SETUP' }
   | { type: 'PLAY_SONG' }
   | { type: 'SET_PREVIEW_URL'; payload: { previewUrl: string } }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
-  | { type: 'CONFIRM_PLACEMENT' }
-  | { type: 'RESET_TO_SETUP' }
+  | { type: 'CONFIRM_PLACEMENT'; payload: { nameGuess: string; artistGuess: string } }
   | { type: 'ADVANCE_TURN' };
 
 const INITIAL_STATE: GameState = {
@@ -27,6 +27,7 @@ const INITIAL_STATE: GameState = {
   currentSong: null,
   tentativePlacementIndex: null,
   placementCorrect: null,
+  guessCorrect: null,
   winner: null,
   usedSongIds: [],
   allSongs: [],
@@ -59,6 +60,7 @@ function createPlayer(index: number, anchorYear: number): Player {
     name: PLAYER_DEFAULT_NAMES[index],
     color: PLAYER_COLORS[index],
     position: PLAYER_POSITIONS[index],
+    chips: 2,
     timeline: [{
       id: `anchor-${index}`,
       name: '',
@@ -124,13 +126,25 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         tentativePlacementIndex,
       );
 
+      const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
+      const guessCorrect =
+        normalize(action.payload.nameGuess) === normalize(currentSong.name) &&
+        normalize(action.payload.artistGuess) === normalize(currentSong.artist);
+
+      // Award chip for correct guess (capped at 20)
+      const updatedPlayersWithChip = players.map((p, i) =>
+        i === currentPlayerIndex && guessCorrect
+          ? { ...p, chips: Math.min(20, p.chips + 1) }
+          : p
+      );
+
       if (correct) {
         const updatedTimeline = insertAtIndex(
-          players[currentPlayerIndex].timeline,
+          updatedPlayersWithChip[currentPlayerIndex].timeline,
           currentSong,
           tentativePlacementIndex,
         );
-        const updatedPlayers = players.map((p, i) =>
+        const updatedPlayers = updatedPlayersWithChip.map((p, i) =>
           i === currentPlayerIndex ? { ...p, timeline: updatedTimeline } : p
         );
 
@@ -141,6 +155,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             players: updatedPlayers,
             winner: updatedPlayers[currentPlayerIndex],
             placementCorrect: true,
+            guessCorrect,
           };
         }
 
@@ -149,10 +164,17 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           phase: GAME_PHASE.REVEALING,
           players: updatedPlayers,
           placementCorrect: true,
+          guessCorrect,
         };
       }
 
-      return { ...state, phase: GAME_PHASE.REVEALING, placementCorrect: false };
+      return {
+        ...state,
+        phase: GAME_PHASE.REVEALING,
+        players: updatedPlayersWithChip,
+        placementCorrect: false,
+        guessCorrect,
+      };
     }
 
     case ACTION.ADVANCE_TURN: {
@@ -175,6 +197,7 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         currentSong: nextSong,
         tentativePlacementIndex: null,
         placementCorrect: null,
+        guessCorrect: null,
         usedSongIds: newUsedIds,
       };
     }
@@ -205,8 +228,8 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     selectPlacement: (slotIndex) =>
       dispatch({ type: ACTION.SELECT_PLACEMENT, payload: { slotIndex } }),
 
-    confirmPlacement: () =>
-      dispatch({ type: ACTION.CONFIRM_PLACEMENT }),
+    confirmPlacement: (nameGuess, artistGuess) =>
+      dispatch({ type: ACTION.CONFIRM_PLACEMENT, payload: { nameGuess, artistGuess } }),
 
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),

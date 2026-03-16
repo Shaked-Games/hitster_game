@@ -30,6 +30,8 @@ export interface Player {
   position: PlayerPosition;
   /** Songs already correctly placed, sorted by year. */
   timeline: Song[];
+  /** Poker chips — start at 2, gain by guessing song name/artist correctly. */
+  chips: number;
 }
 
 /** The four sides of the game board, in clockwise order. */
@@ -49,6 +51,8 @@ export interface GameState {
   tentativePlacementIndex: number | null;
   /** Set during REVEALING phase. null in all other phases. */
   placementCorrect: boolean | null;
+  /** Whether the player's name+artist guess was correct. null outside REVEALING. */
+  guessCorrect: boolean | null;
   /** Set when phase === WON. */
   winner: Player | null;
   usedSongIds: string[];
@@ -62,7 +66,7 @@ export interface GameActions {
   initializeGame: (playerCount: number, songs: Song[], playlist: string) => void;
   playSong: () => Promise<void>;
   selectPlacement: (slotIndex: number) => void;
-  confirmPlacement: () => void;
+  confirmPlacement: (nameGuess: string, artistGuess: string) => void;
   advanceTurn: () => void;
   resetToSetup: () => void;
   markSongUsed: (playlist: string, songName: string, artistName: string) => Promise<void>;

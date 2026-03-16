@@ -51,6 +51,7 @@ export default function GameBoard({ state, actions }: Props) {
     currentSong,
     tentativePlacementIndex,
     placementCorrect,
+    guessCorrect,
   } = state;
 
   const currentPlayer = players[currentPlayerIndex];
@@ -90,6 +91,7 @@ export default function GameBoard({ state, actions }: Props) {
           currentSong={currentSong}
           tentativePlacementIndex={tentativePlacementIndex}
           placementCorrect={placementCorrect}
+          guessCorrect={guessCorrect}
           onPlay={actions.playSong}
           onConfirmPlacement={actions.confirmPlacement}
           onNextTurn={handleNextTurn}

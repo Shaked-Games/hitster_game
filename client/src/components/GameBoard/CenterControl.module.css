@@ -14,12 +14,55 @@
   transition: box-shadow 0.4s ease;
 }
 
-.instruction {
-  font-size: 12px;
+.guessFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 55%;
+  align-items: center;
+}
+
+.guessInput {
+  width: 60%;
+  padding: 9px 13px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.guessInput::placeholder { color: var(--color-text-muted); }
+
+.guessInput:focus {
+  border-color: var(--player-color);
+  background: rgba(255,255,255,0.09);
+}
+
+.guessBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  width: 100%;
+}
+
+.guessCorrect {
+  background: rgba(0, 200, 100, 0.15);
+  border: 1px solid rgba(0, 200, 100, 0.35);
+  color: #00c864;
+}
+
+.guessWrong {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
   color: var(--color-text-muted);
-  text-align: center;
-  max-width: 220px;
-  line-height: 1.5;
 }
 
 /* ── Idle ─────────────────────────────────────────────────────────────────────── */
@@ -272,8 +315,8 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
-.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-right); }
-.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-wrong); }
+.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-p4); }
+.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-p1); }
 
 .resultIcon { font-size: 32px; line-height: 1; }
 
@@ -283,8 +326,8 @@
   letter-spacing: 2px;
 }
 
-.resultCorrect .resultText { color: var(--color-right); }
-.resultWrong   .resultText { color: var(--color-wrong); }
+.resultCorrect .resultText { color: var(--color-p4); }
+.resultWrong   .resultText { color: var(--color-p1); }
 
 .resultYear {
   font-family: var(--font-display);
@@ -293,8 +336,8 @@
   letter-spacing: 2px;
 }
 
-.resultCorrect .resultYear { color: var(--color-right); }
-.resultWrong   .resultYear { color: var(--color-wrong); }
+.resultCorrect .resultYear { color: var(--color-p4); }
+.resultWrong   .resultYear { color: var(--color-p1); }
 
 .nextButton {
   padding: 14px 32px;
