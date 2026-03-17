@@ -11,6 +11,7 @@ import type { Player, Song } from '../../types';
 import { GAME_PHASE } from '../../constants/gameConstants';
 import styles from './CenterControl.module.css';
 import SongCard from './SongCard';
+import { useGame } from '../../context/GameContext';
 
 interface Props {
   phase: string;
@@ -315,6 +316,8 @@ function RevealingView({
   const isWrong     = placementCorrect === false;
   const bothGuessed = nameCorrect === true && artistCorrect === true;
   const guessed     = nameCorrect !== null || artistCorrect !== null;
+  const { state } = useGame();
+  const { nameGuess, artistGuess } = state;
 
   return (
     <div className={styles.revealingView}>
@@ -328,11 +331,11 @@ function RevealingView({
               <>
                 <div className={`${styles.guessRow} ${artistCorrect ? styles.guessHit : styles.guessMiss}`}>
                   <span>{artistCorrect ? '✓' : '✗'}</span>
-                  <span>Artist</span>
+                  <span>{artistGuess || '—'}</span>
                 </div>
                 <div className={`${styles.guessRow} ${nameCorrect ? styles.guessHit : styles.guessMiss}`}>
                   <span>{nameCorrect ? '✓' : '✗'}</span>
-                  <span>Name</span>
+                  <span>{nameGuess || '—'}</span>
                 </div>
                 {bothGuessed ? (
                   <div className={styles.chipReward}>🎉 +1 chip!</div>

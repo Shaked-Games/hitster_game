@@ -6,6 +6,7 @@ import PlayerSetup from './components/PlayerSetup/PlayerSetup';
 import GameBoard from './components/GameBoard/GameBoard';
 import WinScreen from './components/WinScreen/WinScreen';
 import React from 'react';
+import { GameContext } from './context/GameContext';
 
 export default function App() {
   const { state, actions } = useGameState();
@@ -76,7 +77,11 @@ export default function App() {
     );
   }
 
-  return <GameBoard state={state} actions={actions} />;
+  return (
+    <GameContext.Provider value={{ state, actions }}>
+      <GameBoard state={state} actions={actions} />
+    </GameContext.Provider>
+  );
 }
 
 const errorContainerStyle: CSSProperties = {

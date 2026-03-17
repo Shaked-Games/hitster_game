@@ -30,6 +30,8 @@ const INITIAL_STATE: GameState = {
   placementCorrect: null,
   nameCorrect: null,
   artistCorrect: null,
+  nameGuess: '',
+  artistGuess: '',
   winner: null,
   usedSongIds: [],
   allSongs: [],
@@ -159,6 +161,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             placementCorrect: true,
             nameCorrect,
             artistCorrect,
+            nameGuess: action.payload.nameGuess,
+            artistGuess: action.payload.artistGuess,
           };
         }
 
@@ -169,6 +173,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           placementCorrect: true,
           nameCorrect,
           artistCorrect,
+          nameGuess: action.payload.nameGuess,
+          artistGuess: action.payload.artistGuess,
         };
       }
 
@@ -179,6 +185,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         placementCorrect: false,
         nameCorrect,
         artistCorrect,
+        nameGuess: action.payload.nameGuess,
+        artistGuess: action.payload.artistGuess,
       };
     }
 

@@ -55,6 +55,8 @@ export interface GameState {
   nameCorrect: boolean | null;
   /** Whether the player's artist guess was correct. null outside REVEALING. */
   artistCorrect: boolean | null;
+  nameGuess: string;
+  artistGuess: string;
   /** Set when phase === WON. */
   winner: Player | null;
   usedSongIds: string[];
