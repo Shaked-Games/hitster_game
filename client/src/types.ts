@@ -70,6 +70,7 @@ export interface GameActions {
   selectPlacement: (slotIndex: number) => void;
   confirmPlacement: (nameGuess: string, artistGuess: string) => void;
   advanceTurn: () => void;
+  overrideGuess: () => void;
   resetToSetup: () => void;
   markSongUsed: (playlist: string, songName: string, artistName: string) => Promise<void>;
 }

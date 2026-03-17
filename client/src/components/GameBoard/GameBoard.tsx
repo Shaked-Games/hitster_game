@@ -96,6 +96,7 @@ export default function GameBoard({ state, actions }: Props) {
           artistCorrect={artistCorrect}
           onPlay={actions.playSong}
           onConfirmPlacement={actions.confirmPlacement}
+          onOverrideGuess={actions.overrideGuess}
           onNextTurn={handleNextTurn}
         />
       </div>

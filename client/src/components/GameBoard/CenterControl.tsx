@@ -22,6 +22,7 @@ interface Props {
   artistCorrect: boolean | null;
   onPlay: () => void;
   onConfirmPlacement: (nameGuess: string, artistGuess: string) => void;
+  onOverrideGuess: () => void;
   onNextTurn: () => void;
 }
 
@@ -35,6 +36,7 @@ export default function CenterControl({
   artistCorrect,
   onPlay,
   onConfirmPlacement,
+  onOverrideGuess,
   onNextTurn,
 }: Props) {
   return (
@@ -62,6 +64,7 @@ export default function CenterControl({
           artistCorrect={artistCorrect}
           currentSong={currentSong}
           playerColor={currentPlayer.color}
+          onOverrideGuess={onOverrideGuess}
           onNextTurn={onNextTurn}
         />
       )}
@@ -120,18 +123,18 @@ function PlayingView({ currentSong, playerColor, hasSelection, onConfirmPlacemen
         <input
           className={styles.guessInput}
           type="text"
-          placeholder="Song name…"
-          value={nameGuess}
-          onChange={(e) => setNameGuess(e.target.value)}
+          placeholder="Artist…"
+          value={artistGuess}
+          onChange={(e) => setArtistGuess(e.target.value)}
           autoComplete="off"
           spellCheck={false}
         />
         <input
           className={styles.guessInput}
           type="text"
-          placeholder="Artist…"
-          value={artistGuess}
-          onChange={(e) => setArtistGuess(e.target.value)}
+          placeholder="Song name…"
+          value={nameGuess}
+          onChange={(e) => setNameGuess(e.target.value)}
           autoComplete="off"
           spellCheck={false}
         />
@@ -296,9 +299,18 @@ interface RevealingViewProps {
   artistCorrect: boolean | null;
   currentSong: Song | null;
   playerColor: string;
+  onOverrideGuess: () => void;
   onNextTurn: () => void;
 }
-function RevealingView({ placementCorrect, nameCorrect, artistCorrect, currentSong, playerColor, onNextTurn }: RevealingViewProps) {
+function RevealingView({ 
+  placementCorrect, 
+  nameCorrect, 
+  artistCorrect, 
+  currentSong, 
+  playerColor,
+  onOverrideGuess,
+  onNextTurn,
+}: RevealingViewProps) {
   const isCorrect   = placementCorrect === true;
   const isWrong     = placementCorrect === false;
   const bothGuessed = nameCorrect === true && artistCorrect === true;
@@ -314,16 +326,20 @@ function RevealingView({ placementCorrect, nameCorrect, artistCorrect, currentSo
             <p className={styles.guessPanelTitle}>Song Guess</p>
             {guessed ? (
               <>
-                <div className={`${styles.guessRow} ${nameCorrect ? styles.guessHit : styles.guessMiss}`}>
-                  <span>{nameCorrect ? '✓' : '✗'}</span>
-                  <span>Name</span>
-                </div>
                 <div className={`${styles.guessRow} ${artistCorrect ? styles.guessHit : styles.guessMiss}`}>
                   <span>{artistCorrect ? '✓' : '✗'}</span>
                   <span>Artist</span>
                 </div>
-                {bothGuessed && (
+                <div className={`${styles.guessRow} ${nameCorrect ? styles.guessHit : styles.guessMiss}`}>
+                  <span>{nameCorrect ? '✓' : '✗'}</span>
+                  <span>Name</span>
+                </div>
+                {bothGuessed ? (
                   <div className={styles.chipReward}>🎉 +1 chip!</div>
+                ) : (
+                  <button className={styles.overrideButton} onClick={onOverrideGuess}>
+                    I was right!
+                  </button>
                 )}
               </>
             ) : (

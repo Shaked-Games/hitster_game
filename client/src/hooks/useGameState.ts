@@ -18,6 +18,7 @@ type GameAction =
   | { type: 'SET_PREVIEW_URL'; payload: { previewUrl: string } }
   | { type: 'SELECT_PLACEMENT'; payload: { slotIndex: number } }
   | { type: 'CONFIRM_PLACEMENT'; payload: { nameGuess: string; artistGuess: string } }
+  | { type: 'OVERRIDE_GUESS' }
   | { type: 'ADVANCE_TURN' };
 
 const INITIAL_STATE: GameState = {
@@ -181,6 +182,22 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       };
     }
 
+    case ACTION.OVERRIDE_GUESS: {
+      if (state.nameCorrect && state.artistCorrect) return state;
+      const { players, currentPlayerIndex } = state;
+      const updatedPlayers = players.map((p, i) =>
+        i === currentPlayerIndex
+          ? { ...p, chips: Math.min(20, p.chips + 1) }
+          : p
+      );
+      return {
+        ...state,
+        players: updatedPlayers,
+        nameCorrect: true,
+        artistCorrect: true,
+      };
+    }
+
     case ACTION.ADVANCE_TURN: {
       const {
         players, currentPlayerIndex, currentSong,
@@ -236,11 +253,14 @@ export function useGameState(): { state: GameState; actions: GameActions } {
     confirmPlacement: (nameGuess, artistGuess) =>
       dispatch({ type: ACTION.CONFIRM_PLACEMENT, payload: { nameGuess, artistGuess } }),
 
+    overrideGuess: () =>
++     dispatch({ type: ACTION.OVERRIDE_GUESS }),
+
     advanceTurn: () =>
       dispatch({ type: ACTION.ADVANCE_TURN }),
 
     resetToSetup: () =>
-      dispatch({ type: 'RESET_TO_SETUP' }),
+      dispatch({ type: ACTION.RESET_TO_SETUP }),
 
     markSongUsed: (playlist, name, artist) => {
       localMarkSongUsed(playlist, name, artist);
