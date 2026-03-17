@@ -1,10 +1,11 @@
 {
   "name": "hitster-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec \"ts-node --project tsconfig.json src/index.ts\"",
-    "start": "ts-node --project tsconfig.json src/index.ts"
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
