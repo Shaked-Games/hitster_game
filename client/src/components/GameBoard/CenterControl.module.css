@@ -471,3 +471,22 @@
   border-color: rgba(255,255,255,0.3);
   transform: translateY(-1px);
 }
+
+/* ── Play again ──────────────────────── */
+
+.playAgainButton {
+  padding: 14px 32px;
+  border-radius: 12px;
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, #7b2fff, #3b8bff);
+  color: white;
+  box-shadow: 0 8px 30px rgba(123, 47, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.playAgainButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(123, 47, 255, 0.5);
+}

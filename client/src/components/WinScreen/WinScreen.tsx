@@ -1,29 +1,28 @@
-/**
- * WinScreen.tsx
- * Victory screen shown when a player reaches WINNING_CARD_COUNT cards.
- * Displays the winner, a ranked leaderboard, and a Play Again button.
- */
-
 import React from 'react';
 import type { Player } from '../../types';
+import Confetti from './Confetti';
 import styles from './WinScreen.module.css';
 
 interface Props {
   winner: Player;
   players: Player[];
   onPlayAgain: () => void;
+  onClose: () => void;
 }
 
-export default function WinScreen({ winner, players, onPlayAgain }: Props) {
-  const sortedPlayers = [...players].sort(
-    (a, b) => b.timeline.length - a.timeline.length,
-  );
+export default function WinScreen({ winner, players, onPlayAgain, onClose }: Props) {
+  const sortedPlayers = [...players].sort((a, b) => b.timeline.length - a.timeline.length);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.grain} />
+    <>
+      <Confetti />
 
-      <div className={styles.content}>
+      {/* Backdrop — click to close */}
+      <div className={styles.backdrop} onClick={onClose} />
+
+      <div className={styles.modal}>
+        <button className={styles.closeBtn} onClick={onClose} aria-label="Close">✕</button>
+
         <WinnerBadge winner={winner} />
 
         <div className={styles.leaderboard}>
@@ -41,11 +40,9 @@ export default function WinScreen({ winner, players, onPlayAgain }: Props) {
           PLAY AGAIN
         </button>
       </div>
-    </div>
+    </>
   );
 }
-
-// ── Sub-components ─────────────────────────────────────────────────────────────
 
 function WinnerBadge({ winner }: { winner: Player }) {
   return (
@@ -60,11 +57,7 @@ function WinnerBadge({ winner }: { winner: Player }) {
   );
 }
 
-interface RowProps {
-  player: Player;
-  rank: number;
-  isWinner: boolean;
-}
+interface RowProps { player: Player; rank: number; isWinner: boolean; }
 function LeaderboardRow({ player, rank, isWinner }: RowProps) {
   return (
     <div

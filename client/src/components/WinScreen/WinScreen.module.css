@@ -1,58 +1,78 @@
-.container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100vw;
-  height: 100vh;
-  background: radial-gradient(ellipse 80% 60% at 50% 30%, #1a0a2e 0%, var(--color-bg) 70%);
-  overflow: hidden;
-}
+/* ── Backdrop ─────────────────────────────────────────────────────────────── */
 
-.grain {
-  position: absolute;
+.backdrop {
+  position: fixed;
   inset: 0;
-  opacity: 0.3;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  cursor: pointer;
 }
 
-.content {
-  position: relative;
+/* ── Modal ────────────────────────────────────────────────────────────────── */
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 201;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 32px;
-  padding: 56px 64px;
-  background: rgba(18, 18, 30, 0.92);
-  border: 1px solid rgba(255,255,255,0.1);
+  gap: 24px;
+  padding: 48px 56px;
+  background: rgba(14, 14, 24, 0.97);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 28px;
-  backdrop-filter: blur(20px);
-  min-width: 400px;
-  animation: fadeUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  backdrop-filter: blur(24px);
+  min-width: 380px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.7);
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(30px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
-/* ── Winner Badge ─────────────────────────────────────────────────────────────── */
+.closeBtn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.07);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255,255,255,0.14);
+  color: var(--color-text);
+}
+
+/* ── Winner Badge ─────────────────────────────────────────────────────────── */
 
 .winnerBadge {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding: 28px 48px;
+  padding: 24px 44px;
   border-radius: 20px;
   border: 2px solid var(--winner-color);
   background: color-mix(in srgb, var(--winner-color) 10%, transparent);
-  box-shadow: 0 0 60px color-mix(in srgb, var(--winner-color) 30%, transparent);
+  box-shadow: 0 0 50px color-mix(in srgb, var(--winner-color) 25%, transparent);
 }
 
 .trophy {
-  font-size: 48px;
+  font-size: 44px;
   animation: bounce 1s ease infinite;
 }
 
@@ -63,26 +83,26 @@
 
 .winnerName {
   font-family: var(--font-display);
-  font-size: 52px;
+  font-size: 48px;
   letter-spacing: 3px;
   color: var(--winner-color);
   line-height: 1;
 }
 
 .winnerLabel {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--color-text-muted);
 }
 
-/* ── Leaderboard ─────────────────────────────────────────────────────────────── */
+/* ── Leaderboard ──────────────────────────────────────────────────────────── */
 
 .leaderboard {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
 }
 
@@ -90,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: var(--color-surface-2);
   border-radius: 12px;
   border: 1px solid var(--color-border);
@@ -101,34 +121,16 @@
   background: color-mix(in srgb, var(--player-color) 8%, var(--color-surface-2));
 }
 
-.rank {
-  font-family: var(--font-display);
-  font-size: 20px;
-  color: var(--color-text-muted);
-  width: 32px;
-}
+.rank  { font-family: var(--font-display); font-size: 18px; color: var(--color-text-muted); width: 28px; }
+.dot   { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.name  { flex: 1; font-weight: 600; font-size: 14px; }
+.score { font-family: var(--font-display); font-size: 18px; color: var(--player-color); letter-spacing: 1px; }
 
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.name { flex: 1; font-weight: 600; font-size: 15px; }
-
-.score {
-  font-family: var(--font-display);
-  font-size: 20px;
-  color: var(--player-color);
-  letter-spacing: 1px;
-}
-
-/* ── Play Again ─────────────────────────────────────────────────────────────── */
+/* ── Play Again ───────────────────────────────────────────────────────────── */
 
 .playAgainButton {
   width: 100%;
-  padding: 18px;
+  padding: 16px;
   background: linear-gradient(135deg, #7b2fff, #3b8bff);
   border-radius: 14px;
   font-family: var(--font-display);
@@ -139,5 +141,5 @@
   transition: all 0.2s ease;
 }
 
-.playAgainButton:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(123, 47, 255, 0.5); }
+.playAgainButton:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(123,47,255,0.5); }
 .playAgainButton:active { transform: translateY(0); }

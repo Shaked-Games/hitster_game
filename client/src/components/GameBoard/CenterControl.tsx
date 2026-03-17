@@ -25,6 +25,8 @@ interface Props {
   onConfirmPlacement: (nameGuess: string, artistGuess: string) => void;
   onOverrideGuess: () => void;
   onNextTurn: () => void;
+  nextTurnDisabled?: boolean;
+  onPlayAgain?: () => void;
 }
 
 export default function CenterControl({
@@ -39,6 +41,8 @@ export default function CenterControl({
   onConfirmPlacement,
   onOverrideGuess,
   onNextTurn,
+  nextTurnDisabled = false,
+  onPlayAgain,
 }: Props) {
   return (
     <div
@@ -58,7 +62,7 @@ export default function CenterControl({
         />
       )}
 
-      {phase === GAME_PHASE.REVEALING && (
+      {(phase === GAME_PHASE.REVEALING || phase === GAME_PHASE.WON) && (
         <RevealingView
           placementCorrect={placementCorrect}
           nameCorrect={nameCorrect}
@@ -67,6 +71,8 @@ export default function CenterControl({
           playerColor={currentPlayer.color}
           onOverrideGuess={onOverrideGuess}
           onNextTurn={onNextTurn}
+          nextTurnDisabled={nextTurnDisabled}
+          onPlayAgain={onPlayAgain}
         />
       )}
     </div>
@@ -269,30 +275,6 @@ function AudioPlayer({ src, playerColor }: AudioPlayerProps) {
   );
 }
 
-interface PlacingViewProps {
-  currentPlayer: Player;
-  hasSelection: boolean;
-  onConfirmPlacement: () => void;
-}
-function PlacingView({ currentPlayer, hasSelection, onConfirmPlacement }: PlacingViewProps) {
-  return (
-    <div className={styles.placingView}>
-      <p className={styles.placingTitle}>Place the song!</p>
-      <p className={styles.instruction}>
-        {hasSelection
-          ? 'Happy with that spot? Lock it in!'
-          : `${currentPlayer.name}: tap a slot on your timeline`}
-      </p>
-      <button
-        className={styles.lockButton}
-        onClick={onConfirmPlacement}
-        disabled={!hasSelection}
-      >
-        🔒 Lock In
-      </button>
-    </div>
-  );
-}
 
 interface RevealingViewProps {
   placementCorrect: boolean | null;
@@ -302,7 +284,10 @@ interface RevealingViewProps {
   playerColor: string;
   onOverrideGuess: () => void;
   onNextTurn: () => void;
+  nextTurnDisabled?: boolean;
+  onPlayAgain?: () => void;
 }
+
 function RevealingView({ 
   placementCorrect, 
   nameCorrect, 
@@ -311,6 +296,8 @@ function RevealingView({
   playerColor,
   onOverrideGuess,
   onNextTurn,
+  nextTurnDisabled,
+  onPlayAgain,
 }: RevealingViewProps) {
   const isCorrect   = placementCorrect === true;
   const isWrong     = placementCorrect === false;
@@ -369,12 +356,17 @@ function RevealingView({
             <span className={styles.yearPanelText}>{isCorrect ? 'That\'s right!' : 'Not quite!'}</span>
           </div>
         </div>
-
       </div>
 
-      <button className={styles.nextButton} onClick={onNextTurn}>
-        Next Player →
-      </button>
+      {nextTurnDisabled ? (
+         <button className={styles.playAgainButton} onClick={onPlayAgain}>
+           PLAY AGAIN
+         </button>
+       ) : (
+         <button className={styles.nextButton} onClick={onNextTurn}>
+           Next Player →
+         </button>
+       )}
     </div>
   );
 }

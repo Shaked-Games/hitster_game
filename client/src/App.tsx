@@ -4,7 +4,6 @@ import { useGameState } from './hooks/useGameState';
 import { GAME_PHASE } from './constants/gameConstants';
 import PlayerSetup from './components/PlayerSetup/PlayerSetup';
 import GameBoard from './components/GameBoard/GameBoard';
-import WinScreen from './components/WinScreen/WinScreen';
 import React from 'react';
 import { GameContext } from './context/GameContext';
 
@@ -39,7 +38,7 @@ export default function App() {
     }
   }
 
-  async function handlePlayAgain(): Promise<void> {
+  function handlePlayAgain(): void {
     actions.resetToSetup();
   }
 
@@ -67,19 +66,9 @@ export default function App() {
     );
   }
 
-  if (state.phase === GAME_PHASE.WON && state.winner) {
-    return (
-      <WinScreen
-        winner={state.winner}
-        players={state.players}
-        onPlayAgain={handlePlayAgain}
-      />
-    );
-  }
-
   return (
     <GameContext.Provider value={{ state, actions }}>
-      <GameBoard state={state} actions={actions} />
+      <GameBoard state={state} actions={actions} onPlayAgain={handlePlayAgain} />;
     </GameContext.Provider>
   );
 }
