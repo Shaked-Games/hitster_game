@@ -130,9 +130,12 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         tentativePlacementIndex,
       );
 
-      const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
-      const nameCorrect   = normalize(action.payload.nameGuess)   === normalize(currentSong.name);
-      const artistCorrect = normalize(action.payload.artistGuess) === normalize(currentSong.artist);
+      const normalize = (s: string) => s.toLowerCase().replace(/[,."']/g, '').replace(/\s+/g, '');
+      const stripFeat   = (s: string) => s.replace(/\s*feat\..*$/i, '').replace(/\s*ft\..*$/i, '').trim();
+      const stripParens = (s: string) => s.replace(/\s*\(.*?\)\s*/g, '').trim();
+         
+      const nameCorrect   = normalize(action.payload.nameGuess) === normalize(stripParens(currentSong.name));
+      const artistCorrect = normalize(action.payload.artistGuess) === normalize(stripFeat(currentSong.artist));
       const bothCorrect   = nameCorrect && artistCorrect;
 
       // Award chip only if both name AND artist are correct (capped at 20)
