@@ -326,7 +326,6 @@ function RevealingView({
         {/* Left — guess result */}
         <div className={styles.revealSide}>
           <div className={styles.guessPanel}>
-            <p className={styles.guessPanelTitle}>Song Guess</p>
             {guessed ? (
               <>
                 <div className={`${styles.guessRow} ${artistCorrect ? styles.guessHit : styles.guessMiss}`}>
@@ -367,7 +366,7 @@ function RevealingView({
         <div className={styles.revealSide}>
           <div className={`${styles.yearPanel} ${isCorrect ? styles.yearCorrect : styles.yearWrong}`}>
             <span className={styles.yearPanelIcon}>{isCorrect ? '✓' : '✗'}</span>
-            <span className={styles.yearPanelText}>{isCorrect ? 'Correct year!' : 'Not quite!'}</span>
+            <span className={styles.yearPanelText}>{isCorrect ? 'That\'s right!' : 'Not quite!'}</span>
           </div>
         </div>
 
