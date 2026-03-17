@@ -121,7 +121,7 @@ function TimelineSlot({
           <SongCard
             song={currentSong}
             hideYear={false}
-            isCorrect={placementCorrect === true}
+            isCorrect={placementCorrect}
             isWrong={placementCorrect === false}
             playerColor={playerColor}
           />
