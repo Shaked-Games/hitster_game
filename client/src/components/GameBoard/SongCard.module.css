@@ -78,7 +78,7 @@
 /* ── State Variants ──────────────────────────────────────────────────────────── */
 
 .cardCorrect {
-  box-shadow: 0 0 0 2px var(--color-p4), 0 4px 24px rgba(0,232,122,0.35);
+  box-shadow: 0 0 0 2px var(--color-right), 0 4px 24px rgba(0,232,122,0.35);
   animation: correctPulse 0.6s ease;
 }
 

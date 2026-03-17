@@ -297,47 +297,147 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
+  gap: 40px;
+  width: 100%;
 }
 
-.resultBanner {
+.revealColumns {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+
+/* ── Center card ─────────────────────────────── */
+
+.revealCenter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Make the SongCard in reveal bigger */
+.revealCenter > * {
+  transform: scale(1.35);
+  transform-origin: center;
+}
+
+/* ── Side panels ─────────────────────────────── */
+
+.revealSide {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+}
+
+/* ── Guess panel (left) ──────────────────────── */
+
+.guessPanel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 20px 40px;
-  border-radius: 16px;
+  gap: 8px;
+  padding: 14px 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 14px;
+  width: 100%;
   animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
+
+.guessPanelTitle {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.guessRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 8px;
+  width: 100%;
+  justify-content: center;
+}
+
+.guessHit {
+  background: rgba(0,200,100,0.12);
+  color: #00c864;
+}
+
+.guessMiss {
+  background: rgba(255,255,255,0.05);
+  color: var(--color-text-muted);
+}
+
+.chipReward {
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd200;
+  margin-top: 2px;
+}
+
+.guessNone {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+/* ── Year panel (right) ──────────────────────── */
+
+.yearPanel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 14px 12px;
+  border-radius: 14px;
+  width: 100%;
+  animation: revealPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both;
+}
+
+.yearCorrect {
+  background: rgba(0,232,122,0.12);
+  border: 1px solid rgba(0,232,122,0.3);
+}
+
+.yearWrong {
+  background: rgba(255,53,102,0.12);
+  border: 1px solid rgba(255,53,102,0.3);
+}
+
+.yearPanelIcon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.yearCorrect .yearPanelIcon { color: #00e87a; }
+.yearWrong   .yearPanelIcon { color: #ff3566; }
+
+.yearPanelText {
+  font-family: var(--font-display);
+  font-size: 15px;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.yearCorrect .yearPanelText { color: #00e87a; }
+.yearWrong   .yearPanelText { color: #ff3566; }
 
 @keyframes revealPop {
   from { opacity: 0; transform: scale(0.7); }
   to   { opacity: 1; transform: scale(1); }
 }
-
-.resultCorrect { background: rgba(0,232,122,0.12); border: 2px solid var(--color-p4); }
-.resultWrong   { background: rgba(255,53,102,0.12); border: 2px solid var(--color-p1); }
-
-.resultIcon { font-size: 32px; line-height: 1; }
-
-.resultText {
-  font-family: var(--font-display);
-  font-size: 28px;
-  letter-spacing: 2px;
-}
-
-.resultCorrect .resultText { color: var(--color-p4); }
-.resultWrong   .resultText { color: var(--color-p1); }
-
-.resultYear {
-  font-family: var(--font-display);
-  font-size: 52px;
-  line-height: 1;
-  letter-spacing: 2px;
-}
-
-.resultCorrect .resultYear { color: var(--color-p4); }
-.resultWrong   .resultYear { color: var(--color-p1); }
 
 .nextButton {
   padding: 14px 32px;

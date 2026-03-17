@@ -51,8 +51,10 @@ export interface GameState {
   tentativePlacementIndex: number | null;
   /** Set during REVEALING phase. null in all other phases. */
   placementCorrect: boolean | null;
-  /** Whether the player's name+artist guess was correct. null outside REVEALING. */
-  guessCorrect: boolean | null;
+  /** Whether the player's name guess was correct. null outside REVEALING. */
+  nameCorrect: boolean | null;
+  /** Whether the player's artist guess was correct. null outside REVEALING. */
+  artistCorrect: boolean | null;
   /** Set when phase === WON. */
   winner: Player | null;
   usedSongIds: string[];

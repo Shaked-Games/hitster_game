@@ -18,7 +18,8 @@ interface Props {
   currentSong: Song | null;
   tentativePlacementIndex: number | null;
   placementCorrect: boolean | null;
-  guessCorrect: boolean | null;
+  nameCorrect: boolean | null;
+  artistCorrect: boolean | null;
   onPlay: () => void;
   onConfirmPlacement: (nameGuess: string, artistGuess: string) => void;
   onNextTurn: () => void;
@@ -30,7 +31,8 @@ export default function CenterControl({
   currentSong,
   tentativePlacementIndex,
   placementCorrect,
-  guessCorrect,
+  nameCorrect,
+  artistCorrect,
   onPlay,
   onConfirmPlacement,
   onNextTurn,
@@ -56,8 +58,10 @@ export default function CenterControl({
       {phase === GAME_PHASE.REVEALING && (
         <RevealingView
           placementCorrect={placementCorrect}
-          guessCorrect={guessCorrect}
+          nameCorrect={nameCorrect}
+          artistCorrect={artistCorrect}
           currentSong={currentSong}
+          playerColor={currentPlayer.color}
           onNextTurn={onNextTurn}
         />
       )}
@@ -288,37 +292,67 @@ function PlacingView({ currentPlayer, hasSelection, onConfirmPlacement }: Placin
 
 interface RevealingViewProps {
   placementCorrect: boolean | null;
-  guessCorrect: boolean | null;
+  nameCorrect: boolean | null;
+  artistCorrect: boolean | null;
   currentSong: Song | null;
+  playerColor: string;
   onNextTurn: () => void;
 }
-function RevealingView({ placementCorrect, guessCorrect, currentSong, onNextTurn }: RevealingViewProps) {
-  const isCorrect = placementCorrect === true;
-  const isWrong   = placementCorrect === false;
+function RevealingView({ placementCorrect, nameCorrect, artistCorrect, currentSong, playerColor, onNextTurn }: RevealingViewProps) {
+  const isCorrect   = placementCorrect === true;
+  const isWrong     = placementCorrect === false;
+  const bothGuessed = nameCorrect === true && artistCorrect === true;
+  const guessed     = nameCorrect !== null || artistCorrect !== null;
 
   return (
     <div className={styles.revealingView}>
-      <div className={`${styles.resultBanner} ${isCorrect ? styles.resultCorrect : styles.resultWrong}`}>
-        <span className={styles.resultIcon}>{isCorrect ? '✓' : '✗'}</span>
-        <span className={styles.resultText}>{isCorrect ? 'Correct!' : 'Not quite!'}</span>
-      </div>
+      <div className={styles.revealColumns}>
 
-      {guessCorrect !== null && (
-        <div className={`${styles.guessBanner} ${guessCorrect ? styles.guessCorrect : styles.guessWrong}`}>
-          {guessCorrect
-            ? <><span>🎉</span> You named the song! +1 chip</>
-            : <><span>🎵</span> Name / Artist incorrect</>
-          }
+        {/* Left — guess result */}
+        <div className={styles.revealSide}>
+          <div className={styles.guessPanel}>
+            <p className={styles.guessPanelTitle}>Song Guess</p>
+            {guessed ? (
+              <>
+                <div className={`${styles.guessRow} ${nameCorrect ? styles.guessHit : styles.guessMiss}`}>
+                  <span>{nameCorrect ? '✓' : '✗'}</span>
+                  <span>Name</span>
+                </div>
+                <div className={`${styles.guessRow} ${artistCorrect ? styles.guessHit : styles.guessMiss}`}>
+                  <span>{artistCorrect ? '✓' : '✗'}</span>
+                  <span>Artist</span>
+                </div>
+                {bothGuessed && (
+                  <div className={styles.chipReward}>🎉 +1 chip!</div>
+                )}
+              </>
+            ) : (
+              <p className={styles.guessNone}>No guess</p>
+            )}
+          </div>
         </div>
-      )}
 
-      {currentSong && (
-        <SongCard
-          song={currentSong}
-          isCorrect={isCorrect}
-          isWrong={isWrong}
-        />
-      )}
+        {/* Center — big card */}
+        <div className={styles.revealCenter}>
+          {currentSong && (
+            <SongCard
+              song={currentSong}
+              isCorrect={isCorrect}
+              isWrong={isWrong}
+              playerColor={playerColor}
+            />
+          )}
+        </div>
+
+        {/* Right — year placement result */}
+        <div className={styles.revealSide}>
+          <div className={`${styles.yearPanel} ${isCorrect ? styles.yearCorrect : styles.yearWrong}`}>
+            <span className={styles.yearPanelIcon}>{isCorrect ? '✓' : '✗'}</span>
+            <span className={styles.yearPanelText}>{isCorrect ? 'Correct year!' : 'Not quite!'}</span>
+          </div>
+        </div>
+
+      </div>
 
       <button className={styles.nextButton} onClick={onNextTurn}>
         Next Player →

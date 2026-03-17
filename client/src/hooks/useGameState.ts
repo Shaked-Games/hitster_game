@@ -27,7 +27,8 @@ const INITIAL_STATE: GameState = {
   currentSong: null,
   tentativePlacementIndex: null,
   placementCorrect: null,
-  guessCorrect: null,
+  nameCorrect: null,
+  artistCorrect: null,
   winner: null,
   usedSongIds: [],
   allSongs: [],
@@ -127,13 +128,13 @@ function gameReducer(state: GameState, action: GameAction): GameState {
       );
 
       const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, '');
-      const guessCorrect =
-        normalize(action.payload.nameGuess) === normalize(currentSong.name) &&
-        normalize(action.payload.artistGuess) === normalize(currentSong.artist);
+      const nameCorrect   = normalize(action.payload.nameGuess)   === normalize(currentSong.name);
+      const artistCorrect = normalize(action.payload.artistGuess) === normalize(currentSong.artist);
+      const bothCorrect   = nameCorrect && artistCorrect;
 
-      // Award chip for correct guess (capped at 20)
+      // Award chip only if both name AND artist are correct (capped at 20)
       const updatedPlayersWithChip = players.map((p, i) =>
-        i === currentPlayerIndex && guessCorrect
+        i === currentPlayerIndex && bothCorrect
           ? { ...p, chips: Math.min(20, p.chips + 1) }
           : p
       );
@@ -155,7 +156,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
             players: updatedPlayers,
             winner: updatedPlayers[currentPlayerIndex],
             placementCorrect: true,
-            guessCorrect,
+            nameCorrect,
+            artistCorrect,
           };
         }
 
@@ -164,7 +166,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
           phase: GAME_PHASE.REVEALING,
           players: updatedPlayers,
           placementCorrect: true,
-          guessCorrect,
+          nameCorrect,
+          artistCorrect,
         };
       }
 
@@ -173,7 +176,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         phase: GAME_PHASE.REVEALING,
         players: updatedPlayersWithChip,
         placementCorrect: false,
-        guessCorrect,
+        nameCorrect,
+        artistCorrect,
       };
     }
 
@@ -197,7 +201,8 @@ function gameReducer(state: GameState, action: GameAction): GameState {
         currentSong: nextSong,
         tentativePlacementIndex: null,
         placementCorrect: null,
-        guessCorrect: null,
+        nameCorrect: null,
+        artistCorrect: null,
         usedSongIds: newUsedIds,
       };
     }
@@ -235,7 +240,7 @@ export function useGameState(): { state: GameState; actions: GameActions } {
       dispatch({ type: ACTION.ADVANCE_TURN }),
 
     resetToSetup: () =>
-      dispatch({ type: ACTION.RESET_TO_SETUP }),
+      dispatch({ type: 'RESET_TO_SETUP' }),
 
     markSongUsed: (playlist, name, artist) => {
       localMarkSongUsed(playlist, name, artist);

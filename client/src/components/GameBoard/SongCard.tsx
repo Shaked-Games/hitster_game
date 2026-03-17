@@ -30,11 +30,7 @@ export default function SongCard({
   playerColor,
   isAnchor = false,
 }: Props) {
-  const borderColor = isCorrect
-    ? 'var(--color-right)'
-    : isWrong
-    ? 'var(--color-wrong)'
-    : (playerColor ?? 'rgba(255,255,255,0.12)');
+  const borderColor = playerColor ?? 'rgba(255,255,255,0.12)';
 
   const classNames = [
     styles.card,
