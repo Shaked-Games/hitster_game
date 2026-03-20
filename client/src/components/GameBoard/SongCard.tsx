@@ -46,13 +46,13 @@ export default function SongCard({
       className={classNames}
       style={{ '--card-accent': borderColor } as React.CSSProperties}
     >
-      <span className={styles.artist}>
+      <span className={styles.artist} title={!isAnchor && !hideYear ? song.artist : undefined}>
         {isAnchor || hideYear ? '' : song.artist}
       </span>
       <span className={styles.year}>
         {hideYear ? '?' : song.year}
       </span>
-      <span className={styles.songName}>
+      <span className={styles.songName} title={!isAnchor && !hideYear ? song.name : undefined}>
         {isAnchor || hideYear ? '' : song.name}
       </span>
     </div>

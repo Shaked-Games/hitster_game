@@ -91,7 +91,6 @@ function IdleView({ currentPlayer, onPlay }: IdleViewProps) {
       <div className={styles.turnBadge} style={{ background: currentPlayer.color }}>
         {currentPlayer.name}'s Turn
       </div>
-      <p className={styles.songHint}>A mystery song awaits…</p>
       <button className={styles.playButton} onClick={onPlay}>
         <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
           <path d="M8 5.14v14l11-7-11-7z" />
@@ -305,6 +304,12 @@ function RevealingView({
   const guessed     = nameCorrect !== null || artistCorrect !== null;
   const { state } = useGame();
   const { nameGuess, artistGuess } = state;
+  const [ready, setReady] = React.useState(false);
+  
+  React.useEffect(() => {
+    const t = setTimeout(() => setReady(true), 400);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <div className={styles.revealingView}>
@@ -359,11 +364,11 @@ function RevealingView({
       </div>
 
       {nextTurnDisabled ? (
-         <button className={styles.playAgainButton} onClick={onPlayAgain}>
+         <button className={styles.playAgainButton} onClick={onPlayAgain} disabled={!ready}>
            PLAY AGAIN
          </button>
        ) : (
-         <button className={styles.nextButton} onClick={onNextTurn}>
+         <button className={styles.nextButton} onClick={onNextTurn} disabled={!ready}>
            Next Player →
          </button>
        )}
